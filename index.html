@@ -1,1387 +1,242 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8"> 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hospital Municipal · Escala de Motoristas</title>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
-<style>
-:root{
-  --bg:#f0f4f8;--s1:#ffffff;--s2:#f5f8fb;--s3:#e8eef4;
-  --border:#d0dae6;--text:#1a2535;--muted:#6b84a0;
-  --p1:#0a7c55;--p2:#b07800;--p3:#1a5fa8;
-  --red:#c0283e;--gold:#b07800;--purple:#5a3fa8;
-}
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;min-height:100vh;overflow-x:hidden}
-.page{position:relative;z-index:1;padding:20px 24px;max-width:1500px;margin:0 auto}
-
-/* ── HEADER ── */
-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:14px;border-bottom:2px solid var(--border)}
-.brand{display:flex;align-items:center;gap:14px}
-.brand-ico{background:var(--p1);border-radius:12px;width:48px;height:48px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
-.brand-text h1{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;letter-spacing:2px;color:var(--text)}
-.brand-text p{font-size:12px;color:var(--muted);margin-top:2px}
-.hdr-right{display:flex;align-items:center;gap:8px}
-.tag{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;display:inline-flex;align-items:center;gap:6px}
-.tag-live{background:#e6f9f2;border:1px solid #9adfc5;color:var(--p1)}
-.live-dot{width:8px;height:8px;border-radius:50%;background:var(--p1);animation:blink 2s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
-.btn{background:var(--s1);border:1px solid var(--border);color:var(--muted);padding:5px 14px;border-radius:20px;font-size:12px;cursor:pointer;transition:all .2s;font-family:'Barlow',sans-serif}
-.btn:hover{border-color:var(--p1);color:var(--p1)}
-
-/* ── BANNERS ── */
-#banner{display:none;align-items:center;gap:10px;background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:9px 16px;margin-bottom:14px;font-size:13px;flex-wrap:wrap}
-#alertaPeriodo{display:none;align-items:center;gap:10px;background:#fff5e0;border:1px solid #e8c96a;border-radius:10px;padding:10px 16px;margin-bottom:14px;font-size:13px;color:var(--p2);font-weight:600}
-.val-banner{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
-.val-item{display:flex;align-items:center;gap:7px;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:600;border:1px solid}
-.val-ok{background:#e6f9f2;border-color:#9adfc5;color:#0a7c55}
-.val-warn{background:#fdf5e0;border-color:#e8c96a;color:#b07800}
-.val-err{background:#fff0f2;border-color:#f0aab5;color:#c0283e}
-
-/* ── RESUMO EXECUTIVO DO DIA ── */
-.exec-bar{
-  background:var(--s1);border:1px solid var(--border);border-left:4px solid var(--p1);
-  border-radius:0;padding:14px 20px;margin-bottom:16px;
-}
-.exec-bar-title{
-  font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;
-  text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:10px;
-}
-.exec-cards{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
-.exec-card{
-  background:var(--s2);border-radius:8px;padding:10px 12px;text-align:center;
-  border:1px solid var(--border);
-}
-.exec-card-val{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:800;line-height:1}
-.exec-card-lbl{font-size:10px;color:var(--muted);margin-top:3px;line-height:1.3}
-.exec-card-ico{font-size:18px;margin-bottom:4px}
-.exec-card.ok .exec-card-val{color:var(--p1)}
-.exec-card.warn .exec-card-val{color:var(--p2)}
-.exec-card.bad .exec-card-val{color:var(--red)}
-.exec-card.info .exec-card-val{color:var(--p3)}
-
-/* ── SUGESTÃO DE MOTORISTA ── */
-.sugestao-box{
-  background:linear-gradient(135deg,#e6f9f2 0%,#f5fdf9 100%);
-  border:1px solid #9adfc5;border-radius:10px;padding:12px 18px;
-  margin-bottom:14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;
-}
-.sugestao-ico{font-size:28px;flex-shrink:0}
-.sugestao-content{flex:1;min-width:200px}
-.sugestao-title{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;
-  text-transform:uppercase;letter-spacing:1px;color:var(--p1);margin-bottom:3px}
-.sugestao-nome{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:800;color:var(--text);line-height:1}
-.sugestao-desc{font-size:11px;color:var(--muted);margin-top:3px}
-.sugestao-fone{font-size:13px;font-weight:600;color:var(--p1);margin-top:4px}
-
-/* ── CARGA DE TRABALHO BADGE ── */
-.carga-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700}
-.carga-alto{background:#fff0f2;color:var(--red);border:1px solid #f0aab5}
-.carga-medio{background:#e6f9f2;color:var(--p1);border:1px solid #9adfc5}
-.carga-baixo{background:#e8f0fb;color:var(--p3);border:1px solid #90b8e8}
-.carga-zero{background:#fdf5e0;color:var(--p2);border:1px solid #e8c96a}
-
-/* ── TABS ── */
-.tabs{display:flex;margin-bottom:18px;border-bottom:2px solid var(--border)}
-.tab-btn{padding:12px 24px;font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;letter-spacing:1px;color:var(--muted);cursor:pointer;border:none;background:none;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s}
-.tab-btn.active{color:var(--p1);border-bottom-color:var(--p1)}
-.tab-panel{display:none}.tab-panel.active{display:block}
-
-/* ── PLANTÃO ── */
-.date-banner{background:var(--s1);border:1px solid var(--border);border-left:4px solid var(--p1);border-radius:0;padding:14px 22px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
-.date-hoje{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:var(--p1);letter-spacing:1px}
-.date-sub{font-size:13px;color:var(--muted);margin-top:2px}
-.regras-box{display:flex;gap:8px;flex-wrap:wrap}
-.regra{background:#fff5f6;border:1px solid #f0c0c8;border-radius:8px;padding:7px 13px;font-size:11px;color:#c0283e;line-height:1.5}
-.regra-hora{border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700}
-.sec-title{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:10px}
-.plantao-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
-.pc{border-radius:12px;padding:18px 20px;transition:box-shadow .2s;background:var(--s1);border:1px solid var(--border)}
-.pc:hover{box-shadow:0 4px 16px rgba(0,0,0,.08)}
-.pc-p1{border-left:4px solid var(--p1)}.pc-p2{border-left:4px solid var(--p2)}.pc-p3{border-left:4px solid var(--p3)}
-.pc-vazio{opacity:.5}
-.pc-badge{display:inline-flex;align-items:center;justify-content:center;width:auto;min-width:36px;height:36px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:900;margin-bottom:8px;padding:0 10px;gap:5px}
-.pc-p1 .pc-badge{background:#e6f9f2;color:var(--p1)}
-.pc-p2 .pc-badge{background:#fdf5e0;color:var(--p2)}
-.pc-p3 .pc-badge{background:#e8f0fb;color:var(--p3)}
-.pc-nome{font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:800;line-height:1;margin-bottom:4px}
-.pc-p1 .pc-nome{color:var(--p1)}.pc-p2 .pc-nome{color:var(--p2)}.pc-p3 .pc-nome{color:var(--p3)}
-.pc-desc{font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:6px}
-.pc-fone{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px}
-.pc-placa{display:inline-block;background:var(--s2);border:1px solid var(--border);border-radius:5px;padding:2px 8px;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:6px}
-.rs{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;margin-top:4px}
-.rs-ok{background:#e6f9f2;color:var(--p1);border:1px solid #9adfc5}
-.rs-av{background:#fdf5e0;color:var(--p2);border:1px solid #e8c96a}
-.rs-no{background:#fff0f2;color:var(--red);border:1px solid #f0aab5}
-
-/* ── CARDS ── */
-.card{background:var(--s1);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
-.card-scroll{background:var(--s1);border:1px solid var(--border);border-radius:12px;overflow:visible;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
-.card-hd{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--s2)}
-.card-hd h3{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;letter-spacing:1px;color:var(--text)}
-.card-hd span{font-size:11px;color:var(--muted)}
-
-/* ── TABLES ── */
-table.dt{width:100%;border-collapse:collapse}
-table.dt th{padding:9px 13px;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);text-align:left;background:var(--s2);font-weight:700;border-bottom:1px solid var(--border)}
-table.dt td{padding:10px 13px;font-size:13px;border-bottom:1px solid var(--s3);vertical-align:middle;color:var(--text)}
-table.dt tr:last-child td{border:none}
-table.dt tbody tr:hover td{background:var(--s2)}
-.chip-p1{display:inline-flex;padding:4px 11px;border-radius:20px;font-size:11px;font-weight:700;background:#e6f9f2;color:var(--p1);border:1px solid #9adfc5}
-.chip-p2{display:inline-flex;padding:4px 11px;border-radius:20px;font-size:11px;font-weight:700;background:#fdf5e0;color:var(--p2);border:1px solid #e8c96a}
-.chip-p3{display:inline-flex;padding:4px 11px;border-radius:20px;font-size:11px;font-weight:700;background:#e8f0fb;color:var(--p3);border:1px solid #90b8e8}
-.chip-off{display:inline-flex;padding:4px 11px;border-radius:20px;font-size:11px;font-weight:700;background:#fff0f2;color:var(--red);border:1px solid #f0aab5}
-
-/* ── ESCALA ── */
-.esc-outer{display:flex;align-items:stretch;padding:10px 14px}
-.esc-fixed{flex-shrink:0;z-index:2;box-shadow:3px 0 6px rgba(0,0,0,.08)}
-.esc-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;flex:1}
-.esc-table{border-collapse:collapse;font-size:12px}
-.esc-table th{padding:7px 8px;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);background:var(--s2);white-space:nowrap;font-weight:700;text-align:center;border-bottom:1px solid var(--border);height:46px;vertical-align:middle}
-.esc-table td{padding:6px 6px;border-bottom:1px solid var(--s3);text-align:center;min-width:34px;height:32px}
-.esc-table .mc{text-align:left;padding:6px 14px;font-weight:700;font-size:12px;white-space:nowrap;background:var(--s2);height:32px;color:var(--text)}
-.esc-fixed .esc-table th{min-width:110px;text-align:left;padding-left:10px}
-.ep1{background:#e6f9f2;color:var(--p1);border-radius:4px;padding:2px 5px;font-weight:800;font-size:11px}
-.ep2{background:#fdf5e0;color:var(--p2);border-radius:4px;padding:2px 5px;font-weight:800;font-size:11px}
-.ep3{background:#e8f0fb;color:var(--p3);border-radius:4px;padding:2px 5px;font-weight:800;font-size:11px}
-.efe{background:#fff0f2;color:var(--red);border-radius:4px;padding:2px 5px;font-weight:800;font-size:10px}
-.ere{background:#fff5e6;color:#a05800;border-radius:4px;padding:2px 5px;font-weight:800;font-size:10px}
-.eh{outline:2px solid var(--p1);outline-offset:-2px}
-
-/* ── KPIs ESTATÍSTICAS ── */
-.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:11px;margin-bottom:16px}
-.kpi{background:var(--s1);border:1px solid var(--border);border-radius:11px;padding:14px 16px;position:relative;overflow:hidden;transition:box-shadow .2s;box-shadow:0 1px 4px rgba(0,0,0,.04)}
-.kpi:hover{box-shadow:0 4px 16px rgba(0,0,0,.1)}
-.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
-.kpi.c0::before{background:var(--p1)}.kpi.c1::before{background:var(--p2)}.kpi.c2::before{background:var(--p3)}.kpi.c3::before{background:var(--purple)}.kpi.c4::before{background:var(--red)}
-.kpi-lbl{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:4px}
-.kpi-val{font-family:'Barlow Condensed',sans-serif;font-size:34px;font-weight:800;line-height:1;margin-bottom:2px}
-.kpi.c0 .kpi-val{color:var(--p1)}.kpi.c1 .kpi-val{color:var(--p2)}.kpi.c2 .kpi-val{color:var(--p3)}.kpi.c3 .kpi-val{color:var(--purple)}.kpi.c4 .kpi-val{color:var(--red)}
-.kpi-sub{font-size:11px;color:var(--muted)}
-
-/* ── FILTROS ── */
-.filters-wrap{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin-bottom:16px}
-.filters-title{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:10px}
-.fg{display:grid;grid-template-columns:auto auto auto 1fr;gap:18px;align-items:start}
-.fg label{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);display:block;margin-bottom:5px}
-.chips{display:flex;flex-wrap:wrap;gap:4px}
-.chip{padding:5px 13px;border-radius:20px;font-size:12px;font-weight:600;background:var(--s2);border:1px solid var(--border);color:var(--muted);cursor:pointer;transition:all .15s;white-space:nowrap;font-family:'Barlow',sans-serif}
-.chip:hover{border-color:var(--p1);color:var(--p1)}
-.chip.on{background:#e6f9f2;border-color:var(--p1);color:var(--p1)}
-.chip.ob{background:#e8f0fb;border-color:var(--p3);color:var(--p3)}
-
-/* ── GRÁFICOS ── */
-.av{width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:11px;flex-shrink:0}
-.n-big{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:800}
-.bar-row{display:flex;align-items:center;gap:6px;min-width:90px}
-.bar-bg{flex:1;height:5px;background:var(--s3);border-radius:3px;overflow:hidden}
-.bar-fill{height:100%;border-radius:3px;transition:width .8s cubic-bezier(.4,0,.2,1)}
-.bar-pct{font-size:10px;color:var(--muted);min-width:30px;text-align:right}
-.row2{display:grid;grid-template-columns:1fr 280px;gap:14px;margin-bottom:14px}
-.row3{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
-.donut-wrap{display:flex;flex-direction:column;align-items:center;padding:14px 12px 10px}
-.donut-rel{position:relative;display:flex;align-items:center;justify-content:center;margin-bottom:12px}
-svg.dn{transform:rotate(-90deg)}
-.dn-c{position:absolute;text-align:center;font-family:'Barlow Condensed',sans-serif}
-.dn-n{font-size:28px;font-weight:800;color:var(--text);line-height:1}.dn-l{font-size:10px;color:var(--muted);margin-top:1px}
-.legend{display:flex;flex-direction:column;gap:5px;width:100%}
-.li{display:flex;align-items:center;justify-content:space-between}
-.ll{display:flex;align-items:center;gap:6px}.ld{width:8px;height:8px;border-radius:2px;flex-shrink:0}
-.ln{font-size:11px;color:var(--text)}.lr{display:flex;align-items:center;gap:5px}
-.lp{font-size:11px;font-weight:700}.lt{font-size:10px;color:var(--muted)}
-
-/* ── HEATMAP ── */
-.heat-wrap{padding:10px 14px;overflow-x:auto}
-.heat-hdr{display:flex;gap:3px;padding-left:90px;margin-bottom:3px;align-items:flex-end;height:80px}
-.heat-hdr span{width:24px;font-size:9px;color:var(--muted);flex-shrink:0;writing-mode:vertical-rl;transform:rotate(180deg);text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-height:78px}
-.heat-row{display:flex;align-items:center;gap:3px;margin-bottom:2px}
-.heat-lbl{font-size:10px;color:var(--muted);width:86px;flex-shrink:0;text-align:right;padding-right:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.heat-cell{width:24px;height:24px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff;cursor:default;transition:transform .15s;flex-shrink:0}
-.heat-cell:hover{transform:scale(1.4);z-index:10;position:relative}
-
-/* ── LOG DE VIAGENS ── */
-.log-toolbar{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--border);background:var(--s2);flex-wrap:wrap}
-.log-search{flex:1;min-width:160px;border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:12px;font-family:'Barlow',sans-serif;background:var(--s1);color:var(--text);outline:none;transition:border-color .2s}
-.log-search:focus{border-color:var(--p1)}
-.log-search::placeholder{color:var(--muted)}
-.log-wrap{max-height:300px;overflow-y:auto}
-table.log{width:100%;border-collapse:collapse}
-table.log th{padding:8px 12px;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);text-align:left;background:var(--s2);position:sticky;top:0;z-index:1;font-weight:700;border-bottom:1px solid var(--border)}
-table.log td{padding:9px 12px;font-size:12px;border-bottom:1px solid var(--s3);color:var(--text)}
-table.log tr:last-child td{border:none}
-table.log tbody tr:hover td{background:var(--s2)}
-.vb{font-size:11px;font-weight:700;color:var(--muted);background:var(--s2);border:1px solid var(--border);padding:2px 8px;border-radius:4px;white-space:nowrap}
-.hv{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:800;color:var(--p1)}
-
-/* ── ABA VIAGENS ── */
-.viagens-kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:11px;margin-bottom:16px}
-table.vt{width:100%;border-collapse:collapse}
-table.vt th{padding:9px 13px;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);text-align:left;background:var(--s2);font-weight:700;border-bottom:1px solid var(--border);white-space:nowrap}
-table.vt td{padding:10px 13px;font-size:12px;border-bottom:1px solid var(--s3);vertical-align:middle;color:var(--text)}
-table.vt tr:last-child td{border:none}
-table.vt tbody tr:hover td{background:var(--s2)}
-table.vt tr.row-hoje td{background:#f0faf6}
-table.vt tr.row-hoje:hover td{background:#e6f5ee}
-table.vt tr.row-ontem td{background:#fdf8ee}
-table.vt tr.row-ontem:hover td{background:#faf0d8}
-.dest-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;background:#e8f0fb;color:var(--p3);border:1px solid #90b8e8}
-.hora-badge{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:800;color:var(--p1)}
-.pac-badge{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:800;color:var(--purple)}
-.obs-txt{font-size:11px;color:var(--gold);font-weight:600}
-.placa-badge{font-size:11px;font-weight:700;color:var(--muted);background:var(--s2);border:1px solid var(--border);padding:2px 8px;border-radius:4px;white-space:nowrap}
-.viagens-search{flex:1;min-width:160px;border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:12px;font-family:'Barlow',sans-serif;background:var(--s1);color:var(--text);outline:none;transition:border-color .2s}
-.viagens-search:focus{border-color:var(--p1)}
-.viagens-search::placeholder{color:var(--muted)}
-.row-futuro td{background:#f0f4fb}
-.row-futuro:hover td{background:#e8eef8!important}
-.row-sep-data td{background:var(--s3);padding:7px 14px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;color:var(--muted);border-bottom:1px solid var(--border)}
-.fut-badge{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:800;color:var(--p3)}
-.aviso-postagem{background:#e8f0fb;border:1px solid #90b8e8;border-radius:10px;padding:9px 16px;margin-bottom:14px;font-size:12px;color:var(--p3);display:flex;align-items:center;gap:8px}
-
-/* ── FILTROS RÁPIDOS (botões Hoje/Ontem/7dias) ── */
-.filtros-rapidos{display:flex;gap:6px;align-items:center}
-.btn-rapido{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;background:var(--s2);border:1px solid var(--border);color:var(--muted);cursor:pointer;transition:all .15s;font-family:'Barlow',sans-serif}
-.btn-rapido:hover,.btn-rapido.ativo{background:#e6f9f2;border-color:var(--p1);color:var(--p1)}
-
-/* ── CARGA POR DIA DA SEMANA ── */
-.semana-wrap{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;padding:14px 16px}
-.dia-sem-col{text-align:center}
-.dia-sem-label{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:6px}
-.dia-sem-bar-wrap{height:80px;display:flex;align-items:flex-end;justify-content:center;margin-bottom:4px}
-.dia-sem-bar{width:28px;border-radius:4px 4px 0 0;min-height:4px;transition:height .6s}
-.dia-sem-val{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800;color:var(--text)}
-
-/* ── TOOLTIP ── */
-#tip{position:fixed;background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:7px 11px;font-size:12px;pointer-events:none;z-index:9999;display:none;box-shadow:0 4px 16px rgba(0,0,0,.15);line-height:1.6;color:var(--text)}
-
-/* ── FOOTER ── */
-footer{border-top:1px solid var(--border);padding:12px 0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;margin-top:18px}
-footer p{font-size:11px;color:var(--muted)}
-.empty{padding:30px;text-align:center;color:var(--muted);font-size:13px}
-
-@media(max-width:1100px){.row2,.row3{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(3,1fr)}.plantao-grid{grid-template-columns:1fr 1fr}.fg{grid-template-columns:1fr 1fr}.viagens-kpis{grid-template-columns:repeat(2,1fr)}.exec-cards{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:600px){.plantao-grid{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}.page{padding:12px}.tab-btn{font-size:13px;padding:10px 12px}.brand-text h1{font-size:17px}.viagens-kpis{grid-template-columns:repeat(2,1fr)}.exec-cards{grid-template-columns:repeat(2,1fr)}}
-@media print{body{background:#fff}#banner,#alertaPeriodo,.hdr-right,.tabs,#panelStats{display:none!important}.tab-panel{display:block!important}.pc,.card,.card-scroll{box-shadow:none;break-inside:avoid}.page{padding:10px;max-width:100%}.plantao-grid{grid-template-columns:repeat(3,1fr)}footer{border-top:1px solid #ccc}}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hospital Municipal · Escala de Motoristas</title>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 <div class="page">
 
-<header>
-  <div class="brand">
-    <div class="brand-ico">🏥</div>
-    <div class="brand-text">
-      <h1>HOSPITAL MUNICIPAL · ESCALA DE MOTORISTAS</h1>
-      <p id="hdrSub">Gerência de Transporte · Naviraí-MS · Escala 24h×72h · Marcio Castro</p>
-    </div>
-  </div>
-  <div class="hdr-right">
-    <span class="tag tag-live"><span class="live-dot"></span>AO VIVO</span>
-    <button class="btn" id="btnAtualizar">⟳ Atualizar</button>
-    <button class="btn" onclick="window.print()">🖨️ Imprimir</button>
-  </div>
-</header>
-
-<!-- Alertas de período e validação -->
-<div id="alertaPeriodo"></div>
-<div id="valBanner" class="val-banner"></div>
-
-<!-- ═══════════════════════════════════════════════════════════
-     RESUMO EXECUTIVO DO DIA — responde em linguagem humana
-═══════════════════════════════════════════════════════════ -->
-<div class="exec-bar">
-  <div class="exec-bar-title">📊 Resumo executivo do dia — leitura rápida para gestão</div>
-  <div class="exec-cards" id="execCards">
-    <div class="exec-card"><div class="exec-card-ico">📅</div><div class="exec-card-val" id="ec-data">--</div><div class="exec-card-lbl">Data de hoje</div></div>
-    <div class="exec-card" id="ec-viagens-card"><div class="exec-card-ico">🚐</div><div class="exec-card-val" id="ec-viagens">--</div><div class="exec-card-lbl">Viagens hoje</div></div>
-    <div class="exec-card" id="ec-pac-card"><div class="exec-card-ico">🧑‍🤝‍🧑</div><div class="exec-card-val" id="ec-pac">--</div><div class="exec-card-lbl">Pacientes transportados</div></div>
-    <div class="exec-card" id="ec-efic-card"><div class="exec-card-ico">📈</div><div class="exec-card-val" id="ec-efic">--</div><div class="exec-card-lbl">Pacientes por viagem</div></div>
-    <div class="exec-card" id="ec-carga-card"><div class="exec-card-ico">⚖️</div><div class="exec-card-val" id="ec-carga">--</div><div class="exec-card-lbl">Equilíbrio de carga</div></div>
-    <div class="exec-card" id="ec-ocioso-card"><div class="exec-card-ico">💤</div><div class="exec-card-val" id="ec-ocioso">--</div><div class="exec-card-lbl">Motoristas sem viagem</div></div>
-  </div>
-</div>
-
-<!-- Sugestão automática de motorista -->
-<div id="sugestaoBox" class="sugestao-box" style="display:none">
-  <div class="sugestao-ico">🤖</div>
-  <div class="sugestao-content">
-    <div class="sugestao-title">Sugestão inteligente de acionamento</div>
-    <div class="sugestao-nome" id="sugestao-nome">--</div>
-    <div class="sugestao-desc" id="sugestao-desc">--</div>
-    <div class="sugestao-fone" id="sugestao-fone">--</div>
-  </div>
-  <div id="sugestao-carga-box"></div>
-</div>
-
-<div id="banner"></div>
-
-<div class="tabs">
-  <button class="tab-btn active" data-tab="plantao">🟢 Plantão de Hoje</button>
-  <button class="tab-btn" data-tab="viagens">🚐 Viagens</button>
-  <button class="tab-btn" data-tab="escala">📅 Escala do Mês</button>
-  <button class="tab-btn" data-tab="stats">📊 Estatísticas</button>
-</div>
-
-<!-- ═══════════ ABA PLANTÃO ═══════════ -->
-<div class="tab-panel active" id="panelPlantao">
-  <div class="date-banner">
-    <div>
-      <div class="date-hoje" id="dateHoje">--</div>
-      <div class="date-sub" id="dateSub">--</div>
-    </div>
-    <div class="regras-box">
-      <div class="regra">🚫 Após 14h — viagens &gt;160km · Não acionar quem entra plantão dia seguinte</div>
-      <div class="regra">🚫 Após 19h — nenhum acionamento a quem irá entrar de plantão</div>
-      <div id="regraHora" class="regra-hora"></div>
-    </div>
-  </div>
-  <div class="sec-title">🟢 Quem está de plantão agora?</div>
-  <div class="plantao-grid" id="plantaoGrid"></div>
-  <div class="card">
-    <div class="card-hd"><h3>📅 PRÓXIMOS 7 DIAS</h3><span>escala vigente</span></div>
-    <div style="overflow-x:auto">
-      <table class="dt">
-        <thead><tr><th>Data</th><th>Dia</th><th>🏥 P1 — Plantão Hospital</th><th>🚐 P2 — Segunda Saída</th><th>🚑 P3 — Primeira Viagem</th><th>Indisponíveis</th></tr></thead>
-        <tbody id="proxTbody"></tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════ ABA VIAGENS ═══════════ -->
-<div class="tab-panel" id="panelViagens">
-  <div class="viagens-kpis">
-    <div class="kpi c0"><div class="kpi-lbl">Viagens Hoje</div><div class="kpi-val" id="vkHoje">--</div><div class="kpi-sub" id="vkHojeData">--</div></div>
-    <div class="kpi c1"><div class="kpi-lbl">Viagens Ontem</div><div class="kpi-val" id="vkOntem">--</div><div class="kpi-sub" id="vkOntemData">--</div></div>
-    <div class="kpi c2"><div class="kpi-lbl">Motoristas Hoje</div><div class="kpi-val" id="vkMots">--</div><div class="kpi-sub">em serviço hoje</div></div>
-    <div class="kpi c3"><div class="kpi-lbl">Pacientes Hoje</div><div class="kpi-val" id="vkPac">--</div><div class="kpi-sub">total transportados</div></div>
-    <div class="kpi c2"><div class="kpi-lbl">Próximas Viagens</div><div class="kpi-val" id="vkFuturas">--</div><div class="kpi-sub" id="vkFuturasSub">agendadas</div></div>
-  </div>
-  <div class="card">
-    <div class="card-hd"><h3>🚐 VIAGENS DE ONTEM E HOJE</h3><span id="vSubtitle">--</span></div>
-    <div class="log-toolbar">
-      <input class="viagens-search" id="viagensSearch" type="text" placeholder="🔍  Buscar motorista, destino, placa...">
-      <div class="filtros-rapidos">
-        <span style="font-size:11px;color:var(--muted)">Filtro rápido:</span>
-        <button class="btn-rapido ativo" id="frHoje" onclick="filtroRapido('hoje')">● Hoje</button>
-        <button class="btn-rapido" id="frOntem" onclick="filtroRapido('ontem')">Ontem</button>
-        <button class="btn-rapido" id="fr7d" onclick="filtroRapido('7dias')">Últimos 7 dias</button>
-        <button class="btn-rapido" id="frTudo" onclick="filtroRapido('tudo')">Todos</button>
+  <!-- ══ CABEÇALHO ══ -->
+  <header>
+    <div class="brand">
+      <div class="brand-ico">🏥</div>
+      <div class="brand-text">
+        <h1>HOSPITAL MUNICIPAL · ESCALA DE MOTORISTAS</h1>
+        <p id="hdrSub">Gerência de Transporte · Naviraí-MS · Escala 24h×72h · Marcio Castro</p>
       </div>
     </div>
-    <div style="overflow-x:auto">
-      <table class="vt">
-        <thead><tr><th>Dia</th><th>Motorista</th><th>Destino</th><th>Placa</th><th>Saída</th><th>Pacientes</th><th>Obs</th></tr></thead>
-        <tbody id="viagensTbody"></tbody>
-      </table>
+    <div class="hdr-right">
+      <span class="tag tag-live"><span class="live-dot"></span>AO VIVO</span>
+      <button class="btn" id="btnAtualizar">⟳ Atualizar</button>
+      <button class="btn" onclick="window.print()">🖨️ Imprimir</button>
     </div>
+  </header>
+
+  <!-- ══ BANNERS ══ -->
+  <div id="alertaPeriodo"></div>
+  <div id="valBanner" class="val-banner"></div>
+  <div id="banner"></div>
+
+  <!-- ══ ABAS ══ -->
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="plantao">🟢 Plantão de Hoje</button>
+    <button class="tab-btn" data-tab="viagens">🚐 Viagens</button>
+    <button class="tab-btn" data-tab="escala">📅 Escala do Mês</button>
+    <button class="tab-btn" data-tab="stats">📊 Estatísticas</button>
   </div>
-  <div class="aviso-postagem" id="avisoPostagem" style="display:none">
-    📋 Viagens postadas após 19h aparecem aqui imediatamente. Elas passam para "hoje" automaticamente à meia-noite.
-  </div>
-  <div class="card" id="cardFuturas" style="display:none">
-    <div class="card-hd"><h3>📋 PRÓXIMAS VIAGENS AGENDADAS</h3><span id="vFuturasSub">--</span></div>
-    <div style="overflow-x:auto">
-      <table class="vt">
-        <thead><tr><th>Data</th><th>Motorista</th><th>Destino</th><th>Placa</th><th>Saída</th><th>Pacientes</th><th>Obs</th></tr></thead>
-        <tbody id="futurasTbody"></tbody>
-      </table>
+
+  <!-- ══ ABA: PLANTÃO ══ -->
+  <div class="tab-panel active" id="panelPlantao">
+    <div class="date-banner">
+      <div>
+        <div class="date-hoje" id="dateHoje">--</div>
+        <div class="date-sub" id="dateSub">--</div>
+      </div>
+      <div class="regras-box">
+        <div class="regra">🚫 Após 14h — viagens &gt;160km · Não acionar quem entra plantão dia seguinte</div>
+        <div class="regra">🚫 Após 19h — nenhum acionamento a quem irá entrar de plantão</div>
+        <div id="regraHora" class="regra-hora"></div>
+      </div>
     </div>
-  </div>
-</div>
 
-<!-- ═══════════ ABA ESCALA ═══════════ -->
-<div class="tab-panel" id="panelEscala">
-  <div class="card-scroll">
-    <div class="card-hd"><h3>📅 ESCALA COMPLETA DO MÊS</h3><span id="escalaSub">--</span></div>
-    <div class="esc-outer">
-      <div class="esc-fixed"><div id="escalaNomes"></div></div>
-      <div class="esc-scroll"><div id="escalaDias"></div></div>
-    </div>
-  </div>
-</div>
+    <div class="sec-title">🟢 Plantão de Hoje</div>
+    <div class="plantao-grid" id="plantaoGrid"></div>
 
-<!-- ═══════════ ABA ESTATÍSTICAS ═══════════ -->
-<div class="tab-panel" id="panelStats">
-  <div class="filters-wrap">
-    <div class="filters-title">🔍 Filtros &nbsp;<button class="btn" id="btnResetF" style="font-size:10px;padding:3px 10px">✕ Limpar</button></div>
-    <div class="fg">
-      <div><label>Mês</label><div class="chips" id="fMes"></div></div>
-      <div><label>Motorista</label><div class="chips" id="fMot"></div></div>
-      <div><label>Destino</label><div class="chips" id="fDest"></div></div>
-      <div style="align-self:end"><label>Resultado</label><div id="fResult" style="font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:800;color:var(--p1)">--</div></div>
-    </div>
-  </div>
-
-  <!-- KPIs principais -->
-  <div class="kpis">
-    <div class="kpi c0"><div class="kpi-lbl">Total Viagens</div><div class="kpi-val" id="kT">--</div><div class="kpi-sub" id="kP">--</div></div>
-    <div class="kpi c1"><div class="kpi-lbl">Média / Motorista</div><div class="kpi-val" id="kA">--</div><div class="kpi-sub">viagens/pessoa</div></div>
-    <div class="kpi c2"><div class="kpi-lbl">Eficiência Geral</div><div class="kpi-val" id="kEfic">--</div><div class="kpi-sub">pacientes por viagem</div></div>
-    <div class="kpi c3"><div class="kpi-lbl">Mais Ativo</div><div class="kpi-val" id="kTop">--</div><div class="kpi-sub" id="kTopN">viagens</div></div>
-    <div class="kpi c4"><div class="kpi-lbl">Desiquilíbrio de Carga</div><div class="kpi-val" id="kV">--</div><div class="kpi-sub">diferença máx–mín</div></div>
-  </div>
-
-  <!-- Alerta de ociosidade -->
-  <div id="alertaOcioso" style="display:none;margin-bottom:14px"></div>
-
-  <!-- Ranking com carga de trabalho -->
-  <div class="row2">
     <div class="card">
       <div class="card-hd">
-        <h3>📋 RANKING — CARGA DE TRABALHO</h3>
-        <span id="tblSub">--</span>
+        <h3>📅 PRÓXIMOS 7 DIAS</h3>
+        <span>escala vigente</span>
       </div>
-      <table class="dt">
-        <thead><tr>
-          <th>#</th><th>Motorista</th><th>Viagens</th><th>Participação</th>
-          <th>Eficiência</th><th>Carga</th><th>Destino Principal</th>
-        </tr></thead>
-        <tbody id="drvTbody"></tbody>
-      </table>
+      <div style="overflow-x:auto">
+        <table class="dt">
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Dia</th>
+              <th>P1 — Plantão</th>
+              <th>P2 — 2ª viagem</th>
+              <th>P3 — 1ª Viagem</th>
+              <th>Indisponíveis</th>
+            </tr>
+          </thead>
+          <tbody id="proxTbody"></tbody>
+        </table>
+      </div>
     </div>
+  </div>
+
+  <!-- ══ ABA: VIAGENS ══ -->
+  <div class="tab-panel" id="panelViagens">
+    <div class="viagens-kpis" style="grid-template-columns:repeat(5,1fr)">
+      <div class="kpi c0"><div class="kpi-lbl">Viagens Hoje</div><div class="kpi-val" id="vkHoje">--</div><div class="kpi-sub" id="vkHojeData">--</div></div>
+      <div class="kpi c1"><div class="kpi-lbl">Viagens Ontem</div><div class="kpi-val" id="vkOntem">--</div><div class="kpi-sub" id="vkOntemData">--</div></div>
+      <div class="kpi c2"><div class="kpi-lbl">Motoristas Hoje</div><div class="kpi-val" id="vkMots">--</div><div class="kpi-sub">em serviço hoje</div></div>
+      <div class="kpi c3"><div class="kpi-lbl">Pacientes Hoje</div><div class="kpi-val" id="vkPac">--</div><div class="kpi-sub">total transportados</div></div>
+      <div class="kpi c2"><div class="kpi-lbl">Próximas Viagens</div><div class="kpi-val" id="vkFuturas">--</div><div class="kpi-sub" id="vkFuturasSub">agendadas</div></div>
+    </div>
+
     <div class="card">
-      <div class="card-hd"><h3>🥧 DISTRIBUIÇÃO</h3><span>% por motorista</span></div>
-      <div class="donut-wrap">
-        <div class="donut-rel">
-          <svg class="dn" width="130" height="130" viewBox="0 0 130 130" id="donutSvg"></svg>
-          <div class="dn-c"><div class="dn-n" id="donutN">--</div><div class="dn-l">viagens</div></div>
+      <div class="card-hd">
+        <h3>🚐 VIAGENS DE ONTEM E HOJE</h3>
+        <span id="vSubtitle">--</span>
+      </div>
+      <div class="log-toolbar">
+        <input class="viagens-search" id="viagensSearch" type="text" placeholder="🔍  Buscar motorista, destino, placa...">
+      </div>
+      <div style="overflow-x:auto">
+        <table class="vt">
+          <thead>
+            <tr>
+              <th>Dia</th><th>Motorista</th><th>Destino</th>
+              <th>Placa</th><th>Saída</th><th>Pacientes</th><th>Obs</th>
+            </tr>
+          </thead>
+          <tbody id="viagensTbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="aviso-postagem" id="avisoPostagem" style="display:none">
+      📋 Viagens postadas após 19h aparecem aqui imediatamente e ficam visíveis para o grupo.
+      Elas passam para "hoje" automaticamente à meia-noite.
+    </div>
+
+    <div class="card" id="cardFuturas" style="display:none">
+      <div class="card-hd">
+        <h3>📋 PRÓXIMAS VIAGENS AGENDADAS</h3>
+        <span id="vFuturasSub">--</span>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="vt">
+          <thead>
+            <tr>
+              <th>Data</th><th>Motorista</th><th>Destino</th>
+              <th>Placa</th><th>Saída</th><th>Pacientes</th><th>Obs</th>
+            </tr>
+          </thead>
+          <tbody id="futurasTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ ABA: ESCALA DO MÊS ══ -->
+  <div class="tab-panel" id="panelEscala">
+    <div class="card-scroll">
+      <div class="card-hd">
+        <h3>📅 ESCALA COMPLETA DO MÊS</h3>
+        <span id="escalaSub">--</span>
+      </div>
+      <div class="esc-outer">
+        <div class="esc-fixed"><div id="escalaNomes"></div></div>
+        <div class="esc-scroll"><div id="escalaDias"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ ABA: ESTATÍSTICAS ══ -->
+  <div class="tab-panel" id="panelStats">
+    <div class="filters-wrap">
+      <div class="filters-title">
+        🔍 Filtros &nbsp;
+        <button class="btn" id="btnResetF" style="font-size:10px;padding:3px 10px">✕ Limpar</button>
+      </div>
+      <div class="fg">
+        <div><label>Mês</label><div class="chips" id="fMes"></div></div>
+        <div><label>Motorista</label><div class="chips" id="fMot"></div></div>
+        <div><label>Destino</label><div class="chips" id="fDest"></div></div>
+        <div style="align-self:end">
+          <label>Resultado</label>
+          <div id="fResult" style="font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:800;color:var(--p1)">--</div>
         </div>
-        <div class="legend" id="donutLeg"></div>
+      </div>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi c0"><div class="kpi-lbl">Total Viagens</div><div class="kpi-val" id="kT">--</div><div class="kpi-sub" id="kP">--</div></div>
+      <div class="kpi c1"><div class="kpi-lbl">Média / Motorista</div><div class="kpi-val" id="kA">--</div><div class="kpi-sub">viagens/pessoa</div></div>
+      <div class="kpi c2"><div class="kpi-lbl">Destinos</div><div class="kpi-val" id="kD">--</div><div class="kpi-sub">rotas diferentes</div></div>
+      <div class="kpi c3"><div class="kpi-lbl">Mais Viagens</div><div class="kpi-val" id="kTop">--</div><div class="kpi-sub" id="kTopN">--</div></div>
+      <div class="kpi c4"><div class="kpi-lbl">Variação Máxima</div><div class="kpi-val" id="kV">--</div><div class="kpi-sub">entre motoristas</div></div>
+    </div>
+
+    <div class="row2">
+      <div class="card">
+        <div class="card-hd"><h3>📋 RANKING</h3><span id="tblSub">--</span></div>
+        <table class="dt">
+          <thead><tr><th>#</th><th>Motorista</th><th>Viagens</th><th>Part.</th><th>Destino Principal</th><th>vs Média</th></tr></thead>
+          <tbody id="drvTbody"></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-hd"><h3>🥧 DISTRIBUIÇÃO</h3><span>% por motorista</span></div>
+        <div class="donut-wrap">
+          <div class="donut-rel">
+            <svg class="dn" width="130" height="130" viewBox="0 0 130 130" id="donutSvg"></svg>
+            <div class="dn-c"><div class="dn-n" id="donutN">--</div><div class="dn-l">viagens</div></div>
+          </div>
+          <div class="legend" id="donutLeg"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row3">
+      <div class="card">
+        <div class="card-hd"><h3>🔥 MAPA DE CALOR · MOTORISTA × DESTINO</h3><span>nº viagens</span></div>
+        <div class="heat-wrap" id="heatWrap"></div>
+      </div>
+      <div class="card">
+        <div class="card-hd"><h3>📍 VIAGENS POR DESTINO</h3><span id="destSub">--</span></div>
+        <table class="dt">
+          <thead><tr><th>Destino</th><th>Total</th><th>Distribuição</th></tr></thead>
+          <tbody id="destTbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-hd"><h3>📄 REGISTRO DE VIAGENS</h3><span id="logSub">--</span></div>
+      <div class="log-toolbar">
+        <input class="log-search" id="logSearch" type="text" placeholder="🔍  Buscar motorista, destino, placa...">
+      </div>
+      <div class="log-wrap">
+        <table class="log">
+          <thead><tr><th>Data</th><th>Motorista</th><th>Destino</th><th>Placa</th><th>Hora</th><th>Obs</th></tr></thead>
+          <tbody id="logTbody"></tbody>
+        </table>
       </div>
     </div>
   </div>
 
-  <!-- Carga por dia da semana -->
-  <div class="card" style="margin-bottom:14px">
-    <div class="card-hd"><h3>📆 DEMANDA POR DIA DA SEMANA</h3><span>média de viagens · padrão histórico</span></div>
-    <div class="semana-wrap" id="semanaWrap"></div>
-  </div>
-
-  <div class="row3">
-    <div class="card">
-      <div class="card-hd"><h3>🔥 MAPA DE CALOR · MOTORISTA × DESTINO</h3><span>nº viagens</span></div>
-      <div class="heat-wrap" id="heatWrap"></div>
-    </div>
-    <div class="card">
-      <div class="card-hd"><h3>📍 VIAGENS POR DESTINO</h3><span id="destSub">--</span></div>
-      <table class="dt"><thead><tr><th>Destino</th><th>Total</th><th>Distribuição</th></tr></thead><tbody id="destTbody"></tbody></table>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-hd"><h3>📄 REGISTRO DE VIAGENS</h3><span id="logSub">--</span></div>
-    <div class="log-toolbar">
-      <input class="log-search" id="logSearch" type="text" placeholder="🔍  Buscar motorista, destino, placa...">
-    </div>
-    <div class="log-wrap">
-      <table class="log"><thead><tr><th>Data</th><th>Motorista</th><th>Destino</th><th>Placa</th><th>Hora</th><th>Obs</th></tr></thead><tbody id="logTbody"></tbody></table>
-    </div>
-  </div>
+  <!-- ══ RODAPÉ ══ -->
+  <footer>
+    <p>🔒 Painel de Transparência · HMN · Gerência de Transporte · Marcio Castro · Escala 24h×72h
+       &nbsp;·&nbsp; UTI: <span id="footerUTI">--</span>
+       &nbsp;·&nbsp; Transporte: <span id="footerFone">--</span>
+    </p>
+    <p id="tsLbl"></p>
+  </footer>
 </div>
 
-<footer>
-  <p>🔒 Painel de Transparência · HMN · Gerência de Transporte · Marcio Castro · Escala 24h×72h
-     &nbsp;·&nbsp; UTI: <span id="footerUTI">--</span>
-     &nbsp;·&nbsp; Transporte: <span id="footerFone">--</span>
-  </p>
-  <p id="tsLbl"></p>
-</footer>
-</div>
+<!-- Tooltip global -->
 <div id="tip"></div>
 
-<script>
-// =========================================================================
-//  ✏️  ÁREA DE EDIÇÃO MENSAL — ATUALIZE AQUI E FAÇA COMMIT
-// =========================================================================
-
-const CONFIG = {
-  MES_LABEL : "ABRIL 2026",
-  INICIO    : "06/04/2026",
-  FIM       : "05/05/2026",
-
-  // ── COMO FAZER A ROTAÇÃO MENSAL NO GITHUB ──────────────────────────────
-  //  1. Clique no lápis ✏️ para editar este arquivo
-  //  2. Recorte a linha marcada "▼ PRÓXIMO A DESCER" (Ctrl+X)
-  //  3. Cole antes do comentário "← cole aqui" no final (Ctrl+V)
-  //  4. Atualize INICIO / FIM / MES_LABEL para o novo ciclo
-  //  5. Atualize a ESCALA de cada motorista
-  //  6. Commit changes — dashboard atualiza automaticamente
-  //
-  //  Formato ESCALA: "DIA:POSTO  DIA:POSTO  ..."
-  //  Postos:         P1  P2  P3  FERIAS  RECESSO
-  //  Intervalos:     "6-25:FERIAS"
-  //  Dias < INICIO → pertencem ao mês seguinte (maio)
-  //
-  //  ABRIL 2026 — Próximo a descer em MAIO: ROMÁRIO
-  // ─────────────────────────────────────────────────────────────────────
-
-  MOTORISTAS: [
-    // ▼ PRÓXIMO A DESCER — recorte esta linha e cole no final em MAIO ▼
-    { NOME:"ROMÁRIO",      FONE:"98139-4366", PLACA:"QAB-5799", ESCALA:"8:P1  12:P2  16:P1  20:P2  24:P1  28:P2  2:P1" },
-    // ▲ ────────────────────────────────────────────────────────────── ▲
-
-    { NOME:"EDMAR",        FONE:"99947-5310", PLACA:"RWH-0D64", ESCALA:"8:P2  12:P1  16:P2  20:P1  24:P2  28:P1  2:P2" },
-    { NOME:"JOSE MANOEL",  FONE:"99265-1581", PLACA:"SID-7G71", ESCALA:"9:P1  13:P2  17:P3  21:P1  25:P2  29:P3  3:P1" },
-    { NOME:"ROBSON",       FONE:"99641-7423", PLACA:"RWH-0D67", ESCALA:"9:P2  13:P3  17:P1  21:P2  25:P3  29:P1  3:P2" },
-    { NOME:"COSME",        FONE:"99677-0467", PLACA:"SYX-9F79", ESCALA:"9:P3  13:P1  17:P2  21:P3  25:P1  29:P2  3:P3" },
-    { NOME:"SILVIO",       FONE:"99644-7196", PLACA:"TEA-4A97", ESCALA:"6:P1  10:P2  14:P3  18:P1  22:P2  26:P3  30:P1  4:P2" },
-    { NOME:"PAULO GAIOLA", FONE:"99957-2433", PLACA:"RWB-4G28", ESCALA:"6:P2  10:P3  14:P1  18:P2  22:P3  26:P1  30:P2  4:P3" },
-    { NOME:"IVO LEAL",     FONE:"99697-3163", PLACA:"RWA-0J92", ESCALA:"6:P3  10:P1  14:P2  18:P3  22:P1  26:P2  30:P3  4:P1" },
-    { NOME:"ODAIR",        FONE:"99949-6233", PLACA:"QAU-4F33", ESCALA:"7:P1  11:P2  15:P1  19:P2  23:P1  27:P2  1:P3   5:P1" },
-    { NOME:"EDIPO",        FONE:"99122-6035", PLACA:"GCW-5C63", ESCALA:"7:P2  11:P1  15:P2  19:P1  23:P2  27:P3  1:P1   5:P2" },
-    { NOME:"PELKIN",       FONE:"99884-4437", PLACA:"SIL-9E23", ESCALA:"6-25:FERIAS  27:P1  1:P2  5:P3" },
-
-    // ← cole aqui a linha recortada do topo (antes deste comentário)
-  ],
-
-  VEICULOS_UTI    : "GCW-5C63 · RWA-0J92",
-  FONE_TRANSPORTE : "99964-0675",
-  VIAGENS_URL: "https://docs.google.com/spreadsheets/d/e/2PACX-1vS6FJhhY7ifdW7q8c3mObGodJm8fz2mfcLo2qns7aWzUbzJfCKOebOYqEI31sNlsn1vuTAFB__q2egV/pub?gid=164510149&single=true&output=csv",
-};
-
-// =========================================================================
-//  ⚙️  REGRAS DE NEGÓCIO CENTRALIZADAS
-// =========================================================================
-
-// Centraliza as regras de acionamento por horário (evita if/else espalhados)
-function regraAcionamento(hora) {
-  if (hora >= 19) return { nivel: "PROIBIDO",  cls: "var(--red)",  icone: "🚫", texto: "São " + hora + "h — NENHUM acionamento permitido" };
-  if (hora >= 14) return { nivel: "RESTRITO",  cls: "var(--p2)",  icone: "⚠️", texto: "São " + hora + "h — Apenas viagens &lt;160km" };
-  return              { nivel: "LIVRE",      cls: "var(--p1)",  icone: "✅", texto: "São " + hora + "h — Livre para acionar" };
-}
-
-// Classifica a carga de trabalho de um motorista comparado à média
-function classificarCarga(viagens, media) {
-  if (viagens === 0)         return { label: "💤 Sem viagens",     cls: "carga-zero",  cor: "#b07800" };
-  const razao = media > 0 ? viagens / media : 0;
-  if (razao > 1.2)           return { label: "🔴 Sobrecarregado",  cls: "carga-alto",  cor: "#c0283e" };
-  if (razao >= 0.8)          return { label: "🟢 Equilibrado",     cls: "carga-medio", cor: "#0a7c55" };
-  return                            { label: "🔵 Subutilizado",   cls: "carga-baixo", cor: "#1a5fa8" };
-}
-
-// Busca motoristas em serviço num dia/turno específico
-function getMotoristasPorPosto(posto, diaKey) {
-  return MOTS.filter(function(m) { return m.escalaMap[diaKey] === posto; });
-}
-
-// Busca motoristas disponíveis hoje (qualquer plantão, não férias/recesso)
-function getMotoristaDisponivelHoje(diaKey) {
-  return MOTS.filter(function(m) {
-    const v = m.escalaMap[diaKey] || "";
-    return v !== "" && v !== "FERIAS" && v !== "RECESSO";
-  });
-}
-
-// =========================================================================
-//  ⚙️  SISTEMA — parse, utilitários, render
-// =========================================================================
-
-function parseConfig() {
-  const [d0, m0, y0] = CONFIG.INICIO.split("/").map(Number);
-  const [d1, m1, y1] = CONFIG.FIM.split("/").map(Number);
-  return CONFIG.MOTORISTAS.map(function(m) {
-    const escalaMap = {};
-    function adicionarEntrada(dNum, posto) {
-      if (isNaN(dNum) || dNum < 1 || dNum > 31) return;
-      const mes  = dNum >= d0 ? m0 : m1;
-      const ano  = dNum >= d0 ? y0 : y1;
-      const chave = ano + "-" + String(mes).padStart(2,"0") + "-" + String(dNum).padStart(2,"0");
-      escalaMap[chave] = posto.toUpperCase();
-    }
-    (m.ESCALA || "").trim().split(/\s+/).forEach(function(entrada) {
-      if (!entrada.includes(":")) return;
-      const col    = entrada.lastIndexOf(":");
-      const diaStr = entrada.slice(0, col).trim();
-      const posto  = entrada.slice(col + 1).trim();
-      if (!posto) return;
-      if (diaStr.includes("-")) {
-        const [inicio, fim] = diaStr.split("-").map(Number);
-        if (!isNaN(inicio) && !isNaN(fim) && inicio <= fim)
-          for (let d = inicio; d <= fim; d++) adicionarEntrada(d, posto);
-      } else {
-        adicionarEntrada(parseInt(diaStr), posto);
-      }
-    });
-    return { nome: m.NOME, fone: m.FONE, placa: m.PLACA, escalaMap };
-  });
-}
-
-const MOTS = parseConfig();
-const [_d0, _m0, _y0] = CONFIG.INICIO.split("/").map(Number);
-const [_d1, _m1, _y1] = CONFIG.FIM.split("/").map(Number);
-const ESC_INICIO = new Date(_y0, _m0-1, _d0);
-const ESC_FIM    = new Date(_y1, _m1-1, _d1);
-
-const REFRESH_MS = 5 * 60 * 1000;
-const DIAS_CURTOS  = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
-const DIAS_LONGOS  = ["Domingo","Segunda-feira","Terça-feira","Quarta-feira","Quinta-feira","Sexta-feira","Sábado"];
-const MES_NOMES    = ["","JAN","FEV","MAR","ABR","MAI","JUN","JUL","AGO","SET","OUT","NOV","DEZ"];
-const PALETA_CORES = ["#0a7c55","#1a5fa8","#b07800","#7a3fa8","#c0283e","#0e7a8a","#5a7a20","#a05800","#1a6fa8","#0a6644","#884020","#3a5fa8"];
-
-let VIAGENS = [], logRowsCache = [], viagensCache = [], filtroAtual = "hoje";
-let selMes = new Set(), selMot = new Set(), selDest = new Set();
-let MCORE = {};
-let fetchTimer = null, nextFetch = null;
-
-// Mapeia cor fixa por motorista
-[...new Set(MOTS.map(function(m) { return m.nome; }))].sort().forEach(function(nome, i) {
-  MCORE[nome] = PALETA_CORES[i % PALETA_CORES.length];
-});
-
-// ── Utilidades ────────────────────────────────────────────────────────────
-function esc(s) { return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;"); }
-function iniciais(nome) { const p = nome.split(" "); return p.length >= 2 ? p[0][0]+p[1][0] : nome.slice(0,2); }
-function normalizar(s) { return String(s).toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g,""); }
-function chaveData(data) { return data.getFullYear()+"-"+String(data.getMonth()+1).padStart(2,"0")+"-"+String(data.getDate()).padStart(2,"0"); }
-function dtParaChave(dt) { if(!dt||!dt.includes("/")) return ""; const p=dt.split("/"); if(p.length<3) return ""; return p[2]+"-"+p[1].padStart(2,"0")+"-"+p[0].padStart(2,"0"); }
-function formatarDiaMes(dt) { if(!dt) return "--"; const p=dt.split("/"); return p[0]+"/"+p[1]; }
-function showTip(e,h){ const t=document.getElementById("tip"); t.innerHTML=h; t.style.display="block"; moveTip(e); }
-function moveTip(e){ const t=document.getElementById("tip"); t.style.left=(e.clientX+14)+"px"; t.style.top=(e.clientY-10)+"px"; }
-function hideTip(){ document.getElementById("tip").style.display="none"; }
-
-// ── Abas ─────────────────────────────────────────────────────────────────
-function switchTab(nomeDaAba) {
-  document.querySelectorAll(".tab-btn").forEach(function(b) {
-    b.classList.toggle("active", b.dataset.tab === nomeDaAba);
-  });
-  document.querySelectorAll(".tab-panel").forEach(function(p) { p.classList.remove("active"); });
-  const painel = document.getElementById("panel" + nomeDaAba.charAt(0).toUpperCase() + nomeDaAba.slice(1));
-  if (painel) painel.classList.add("active");
-}
-
-// ── Validação automática da escala ───────────────────────────────────────
-function validarEscala() {
-  const alertas = [];
-  const mapaDia = {};
-
-  // Monta mapa: dia → turno → [nomes]
-  MOTS.forEach(function(motorista) {
-    Object.entries(motorista.escalaMap).forEach(function([chave, turno]) {
-      if (!mapaDia[chave]) mapaDia[chave] = {};
-      if (!mapaDia[chave][turno]) mapaDia[chave][turno] = [];
-      mapaDia[chave][turno].push(motorista.nome);
-    });
-  });
-
-  // Verifica conflitos (2 motoristas no mesmo turno/dia)
-  Object.entries(mapaDia).forEach(function([chave, turnos]) {
-    ["P1","P2","P3"].forEach(function(turno) {
-      if (turnos[turno] && turnos[turno].length > 1) {
-        const dp = chave.split("-");
-        alertas.push({ tipo:"err", msg:"⚠️ Conflito " + turno + " no dia " + dp[2] + "/" + dp[1] + ": " + turnos[turno].join(" + ") });
-      }
-    });
-  });
-
-  // Verifica férias sobrepondo plantão
-  MOTS.forEach(function(motorista) {
-    const diasFerias = Object.entries(motorista.escalaMap).filter(function([,v]){ return v==="FERIAS"||v==="RECESSO"; }).map(function([k]){ return k; });
-    const diasTrabalho = Object.entries(motorista.escalaMap).filter(function([,v]){ return v!=="FERIAS"&&v!=="RECESSO"; }).map(function([k]){ return k; });
-    diasFerias.forEach(function(dFerias) {
-      if (diasTrabalho.includes(dFerias)) {
-        const dp = dFerias.split("-");
-        alertas.push({ tipo:"err", msg:"⚠️ " + motorista.nome + " está de férias e escalado no dia " + dp[2] + "/" + dp[1] });
-      }
-    });
-  });
-
-  // Verifica P3 descoberto
-  const cur = new Date(ESC_INICIO);
-  while (cur <= ESC_FIM) {
-    const chave = chaveData(cur);
-    const t = mapaDia[chave] || {};
-    const temP1 = (t["P1"]||[]).length === 1;
-    const temP2 = (t["P2"]||[]).length === 1;
-    const temP3 = (t["P3"]||[]).length > 0;
-    if (temP1 && temP2 && !temP3) {
-      alertas.push({ tipo:"warn", msg:"! P3 descoberto: " + String(cur.getDate()).padStart(2,"0") + "/" + String(cur.getMonth()+1).padStart(2,"0") });
-    }
-    cur.setDate(cur.getDate()+1);
-  }
-
-  // Motorista duplicado
-  const nomesVistos = new Set();
-  MOTS.forEach(function(m) {
-    if (nomesVistos.has(m.nome)) alertas.push({ tipo:"err", msg:"⚠️ Motorista duplicado na escala: " + m.nome });
-    nomesVistos.add(m.nome);
-  });
-
-  return alertas;
-}
-
-function renderValBanner() {
-  const itens  = validarEscala();
-  const erros  = itens.filter(function(i){ return i.tipo==="err"; });
-  const avisos = itens.filter(function(i){ return i.tipo==="warn"; });
-  let html = "";
-  if (!erros.length && !avisos.length) {
-    html = '<div class="val-item val-ok">✅ Escala válida — nenhum conflito detectado para ' + CONFIG.MES_LABEL + '</div>';
-  } else {
-    if (erros.length) html += erros.map(function(i){ return '<div class="val-item val-err">'+esc(i.msg)+'</div>'; }).join("");
-    if (avisos.length) html += '<div class="val-item val-warn">⚠️ ' + avisos.length + ' turno(s) P3 sem cobertura — PELKIN em férias (verifique o grupo D)</div>';
-  }
-  document.getElementById("valBanner").innerHTML = html;
-}
-
-// ── Resumo Executivo do Dia ───────────────────────────────────────────────
-function renderExecBar() {
-  const agora    = new Date();
-  const refHoje  = new Date(agora);
-  if (agora.getHours() < 6) refHoje.setDate(refHoje.getDate()-1);
-  refHoje.setHours(0,0,0,0);
-  const hojeKey  = chaveData(refHoje);
-
-  // Dados das viagens de hoje
-  const viagensHoje = VIAGENS.filter(function(v){ return dtParaChave(v.dt) === hojeKey; });
-  const pacientesHoje = viagensHoje.reduce(function(s,v){ return s+(parseInt(v.pac)||0); }, 0);
-  const eficiencia = viagensHoje.length > 0 ? (pacientesHoje / viagensHoje.length).toFixed(1) : "--";
-
-  // Carga de trabalho — motoristas com e sem viagem
-  const motoristasHoje  = getMotoristaDisponivelHoje(hojeKey);
-  const comViagem       = new Set(viagensHoje.map(function(v){ return v.m; }));
-  const semViagem       = motoristasHoje.filter(function(m){ return !comViagem.has(m.nome); });
-  const totalViagens    = VIAGENS.reduce(function(acc, v) {
-    if (!acc[v.m]) acc[v.m] = 0; acc[v.m]++; return acc;
-  }, {});
-  const vals  = Object.values(totalViagens);
-  const media = vals.length ? vals.reduce(function(a,b){return a+b;},0)/vals.length : 0;
-  const max   = vals.length ? Math.max(...vals) : 0;
-  const min   = vals.length ? Math.min(...vals) : 0;
-  const equilíbrio = vals.length > 1 ? (max-min <= 3 ? "✅ Equilibrado" : max-min <= 6 ? "⚠️ Atenção" : "🔴 Desequilíbrio") : "--";
-  const clsEq = vals.length > 1 ? (max-min <= 3 ? "ok" : max-min <= 6 ? "warn" : "bad") : "info";
-
-  // Data formatada
-  const dataFmt = String(refHoje.getDate()).padStart(2,"0")+"/"+String(refHoje.getMonth()+1).padStart(2,"0")+"/"+refHoje.getFullYear();
-
-  document.getElementById("ec-data").textContent     = dataFmt;
-  document.getElementById("ec-viagens").textContent  = viagensHoje.length || (VIAGENS.length ? "0" : "--");
-  document.getElementById("ec-pac").textContent      = pacientesHoje || (VIAGENS.length ? "0" : "--");
-  document.getElementById("ec-efic").textContent     = eficiencia;
-  document.getElementById("ec-carga").textContent    = equilíbrio.replace("✅ ","").replace("⚠️ ","").replace("🔴 ","");
-  document.getElementById("ec-ocioso").textContent   = semViagem.length || "0";
-
-  document.getElementById("ec-viagens-card").className = "exec-card " + (viagensHoje.length > 0 ? "ok" : "warn");
-  document.getElementById("ec-pac-card").className     = "exec-card " + (pacientesHoje > 0 ? "ok" : "info");
-  document.getElementById("ec-efic-card").className    = "exec-card " + (parseFloat(eficiencia) >= 1.5 ? "ok" : "info");
-  document.getElementById("ec-carga-card").className   = "exec-card " + clsEq;
-  document.getElementById("ec-ocioso-card").className  = "exec-card " + (semViagem.length > 0 ? "warn" : "ok");
-}
-
-// ── Sugestão Automática de Motorista ─────────────────────────────────────
-function renderSugestao() {
-  const agora   = new Date();
-  const refHoje = new Date(agora);
-  if (agora.getHours() < 6) refHoje.setDate(refHoje.getDate()-1);
-  refHoje.setHours(0,0,0,0);
-  const hojeKey = chaveData(refHoje);
-
-  const regra = regraAcionamento(agora.getHours());
-  const disponiveis = getMotoristaDisponivelHoje(hojeKey).filter(function(m) {
-    const turno = m.escalaMap[hojeKey];
-    // P1 está de plantão no hospital, não acionar para viagem se for o único P1
-    return turno === "P2" || turno === "P3";
-  });
-
-  if (!disponiveis.length || regra.nivel === "PROIBIDO") {
-    document.getElementById("sugestaoBox").style.display = "none";
-    return;
-  }
-
-  // Escolhe o motorista com MENOS viagens no período (menor carga)
-  const contagemViagens = {};
-  VIAGENS.forEach(function(v){ contagemViagens[v.m] = (contagemViagens[v.m]||0) + 1; });
-  const sugerido = disponiveis.slice().sort(function(a,b) {
-    return (contagemViagens[a.nome]||0) - (contagemViagens[b.nome]||0);
-  })[0];
-
-  const totalViagens = VIAGENS.reduce(function(acc, v) {
-    if (!acc[v.m]) acc[v.m] = 0; acc[v.m]++; return acc;
-  }, {});
-  const vals  = Object.values(totalViagens);
-  const media = vals.length ? vals.reduce(function(a,b){return a+b;},0)/vals.length : 0;
-  const viagensSugerido = contagemViagens[sugerido.nome] || 0;
-  const carga = classificarCarga(viagensSugerido, media);
-
-  document.getElementById("sugestaoBox").style.display = "flex";
-  document.getElementById("sugestao-nome").textContent = sugerido.nome;
-  document.getElementById("sugestao-desc").textContent =
-    "Turno: " + sugerido.escalaMap[hojeKey] + " · " + viagensSugerido + " viagem(ns) no período · Menor carga disponível";
-  document.getElementById("sugestao-fone").innerHTML = "📱 " + esc(sugerido.fone) + " &nbsp;·&nbsp; 🚐 " + esc(sugerido.placa);
-  document.getElementById("sugestao-carga-box").innerHTML =
-    '<span class="carga-badge '+carga.cls+'">'+carga.label+'</span>';
-}
-
-// ── Render Plantão de Hoje ────────────────────────────────────────────────
-function renderPlantao() {
-  const agora = new Date();
-  const hora  = agora.getHours();
-  const ref   = new Date(agora);
-  if (hora < 6) ref.setDate(ref.getDate() - 1);
-  ref.setHours(0,0,0,0);
-  const hojeKey = chaveData(ref);
-
-  // Data e horário
-  document.getElementById("dateHoje").textContent =
-    DIAS_LONGOS[ref.getDay()] + ", " + String(ref.getDate()).padStart(2,"0") + "/"
-    + String(ref.getMonth()+1).padStart(2,"0") + "/" + ref.getFullYear();
-  document.getElementById("dateSub").textContent = CONFIG.MES_LABEL + " · " + MOTS.length + " motoristas";
-  document.getElementById("tsLbl").textContent   = "🔄 Atualizado às " + agora.toLocaleTimeString("pt-BR");
-
-  // Alerta de período
-  const alertEl = document.getElementById("alertaPeriodo");
-  if (ref < ESC_INICIO || ref > ESC_FIM) {
-    alertEl.style.display = "flex";
-    alertEl.innerHTML = "⚠️ A data de hoje está fora do período configurado (" + CONFIG.INICIO + " – " + CONFIG.FIM + "). Atualize o CONFIG no GitHub para o novo ciclo.";
-  } else {
-    alertEl.style.display = "none";
-  }
-
-  // Regra de acionamento centralizada
-  const regra = regraAcionamento(hora);
-  const rEl   = document.getElementById("regraHora");
-  const clsMap = { "PROIBIDO": "#fff0f2;border:1px solid #f0aab5", "RESTRITO": "#fdf5e0;border:1px solid #e8c96a", "LIVRE": "#e6f9f2;border:1px solid #9adfc5" };
-  rEl.style.cssText = "background:" + clsMap[regra.nivel] + ";border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;color:" + regra.cls;
-  rEl.innerHTML = regra.icone + " " + regra.texto;
-
-  // Cards de plantão
-  const p1 = getMotoristasPorPosto("P1", hojeKey);
-  const p2 = getMotoristasPorPosto("P2", hojeKey);
-  const p3 = getMotoristasPorPosto("P3", hojeKey);
-  const indisponiveis = MOTS.filter(function(m) {
-    const v = m.escalaMap[hojeKey] || "";
-    return v === "FERIAS" || v === "RECESSO";
-  });
-
-  function montarCard(tipo, lista, cls, descricaoCompleta, emoji) {
-    if (!lista.length) return '<div class="pc pc-vazio pc-'+cls+'"><div class="pc-badge">'+emoji+' '+tipo+'</div><div style="color:var(--muted);margin-top:4px">— Sem escala para hoje —</div></div>';
-    return lista.map(function(motorista) {
-      const cor = MCORE[motorista.nome] || "#555";
-      return '<div class="pc pc-'+cls+'">'
-        + '<div class="pc-badge">'+emoji+' '+tipo+'</div>'
-        + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">'
-        + '<div class="av" style="width:36px;height:36px;background:'+cor+'18;color:'+cor+';border:2px solid '+cor+'50;font-size:12px">'+esc(iniciais(motorista.nome))+'</div>'
-        + '<div class="pc-nome">'+esc(motorista.nome)+'</div></div>'
-        + '<div class="pc-desc">'+descricaoCompleta+'</div>'
-        + '<div class="pc-fone">📱 '+esc(motorista.fone||"—")+'</div>'
-        + '<span class="pc-placa">🚐 '+esc(motorista.placa||"—")+'</span>'
-        + '<div><span class="rs rs-ok">✅ Em serviço hoje</span></div></div>';
-    }).join("");
-  }
-
-  let html = montarCard("P1 — Plantão Hospital", p1, "p1", "🏥 Fica no hospital atendendo chamadas internas e emergências locais", "🏥");
-  html    += montarCard("P2 — Segunda Saída",    p2, "p2", "🚐 Segunda opção para viagens externas. Disponível se P3 estiver ocupado", "🚐");
-  html    += montarCard("P3 — Primeira Viagem",  p3, "p3", "🚑 Primeira opção para acionar viagens externas e transporte de pacientes", "🚑");
-
-  if (indisponiveis.length) {
-    html += '<div class="pc" style="background:#fff5f6;border:1px solid #f0c0c8;grid-column:1/-1;padding:12px 16px">'
-      + '<span style="font-size:12px;color:var(--red);font-weight:700">🏖️ INDISPONÍVEIS HOJE: </span>'
-      + '<span style="font-size:12px;color:var(--muted)">'
-      + indisponiveis.map(function(m) {
-          return esc(m.nome) + (m.escalaMap[hojeKey] === "RECESSO" ? " (Recesso)" : " (Férias)");
-        }).join(" · ")
-      + '</span></div>';
-  }
-  document.getElementById("plantaoGrid").innerHTML = html;
-
-  // Tabela próximos 7 dias
-  const linhas = [];
-  for (let i = 0; i <= 7; i++) {
-    const dia = new Date(agora); dia.setDate(agora.getDate() + i); dia.setHours(0,0,0,0);
-    if (dia < ESC_INICIO || dia > ESC_FIM) continue;
-    const chave = chaveData(dia);
-    if (!MOTS.some(function(m){ return m.escalaMap[chave]; })) continue;
-
-    const p1n  = getMotoristasPorPosto("P1", chave).map(function(m){ return m.nome; });
-    const p2n  = getMotoristasPorPosto("P2", chave).map(function(m){ return m.nome; });
-    const p3n  = getMotoristasPorPosto("P3", chave).map(function(m){ return m.nome; });
-    const fen  = MOTS.filter(function(m){ const v=m.escalaMap[chave]||""; return v==="FERIAS"||v==="RECESSO"; })
-                     .map(function(m){ return m.nome+(m.escalaMap[chave]==="RECESSO"?" (Rec)":" (Fér)"); });
-    const eHoje = i === 0;
-    const dtFmt = String(dia.getDate()).padStart(2,"0")+"/"+String(dia.getMonth()+1).padStart(2,"0")+"/"+dia.getFullYear();
-    function chips(nomes, cls) { return nomes.length ? nomes.map(function(n){ return '<span class="'+cls+'">'+esc(n)+'</span>'; }).join(" ") : '<span style="color:var(--muted);font-size:11px">—</span>'; }
-    linhas.push('<tr style="'+(eHoje?"background:#f0faf6":"")+'"><td style="font-weight:700;font-size:12px;color:'+(eHoje?"var(--p1)":"var(--muted)")+'">'+dtFmt+(eHoje?' <span style="color:var(--p1);font-size:10px">●HOJE</span>':"")+
-      '</td><td style="font-size:12px;color:var(--muted)">'+DIAS_CURTOS[dia.getDay()]+'</td>'
-      + '<td>'+chips(p1n,"chip-p1")+'</td>'
-      + '<td>'+chips(p2n,"chip-p2")+'</td>'
-      + '<td>'+chips(p3n,"chip-p3")+'</td>'
-      + '<td>'+(fen.length?fen.map(function(n){ return '<span class="chip-off">🏖️ '+esc(n)+'</span>'; }).join(" "):"—")+'</td></tr>');
-  }
-  document.getElementById("proxTbody").innerHTML = linhas.join("") || '<tr><td colspan="6" class="empty">Sem dados no período</td></tr>';
-}
-
-// ── Filtro Rápido de Viagens ──────────────────────────────────────────────
-function filtroRapido(periodo) {
-  filtroAtual = periodo;
-  ["frHoje","frOntem","fr7d","frTudo"].forEach(function(id) { document.getElementById(id).classList.remove("ativo"); });
-  const mapa = { hoje:"frHoje", ontem:"frOntem", "7dias":"fr7d", tudo:"frTudo" };
-  if (mapa[periodo]) document.getElementById(mapa[periodo]).classList.add("ativo");
-  renderViagensTbody();
-}
-
-// ── Render Viagens ────────────────────────────────────────────────────────
-function renderViagens() {
-  const agora   = new Date();
-  const refHoje = new Date(agora);
-  if (agora.getHours() < 6) refHoje.setDate(refHoje.getDate()-1);
-  refHoje.setHours(0,0,0,0);
-  const hojeKey  = chaveData(refHoje);
-  const ontemData = new Date(refHoje); ontemData.setDate(refHoje.getDate()-1);
-  const ontemKey = chaveData(ontemData);
-
-  function keyParaDt(k) { const p=k.split("-"); return p[2]+"/"+p[1]+"/"+p[0]; }
-  const hojeStr  = keyParaDt(hojeKey);
-  const ontemStr = keyParaDt(ontemKey);
-
-  function ordenarPorHora(arr) { return arr.slice().sort(function(a,b){ return (a.hora||"99:99").localeCompare(b.hora||"99:99"); }); }
-
-  const viagensHoje   = VIAGENS.filter(function(r){ return dtParaChave(r.dt)===hojeKey; });
-  const viagensOntem  = VIAGENS.filter(function(r){ return dtParaChave(r.dt)===ontemKey; });
-  const viagensFutura = VIAGENS.filter(function(r){ return dtParaChave(r.dt)>hojeKey; });
-  viagensFutura.sort(function(a,b){
-    const ka=dtParaChave(a.dt),kb=dtParaChave(b.dt);
-    return ka!==kb ? ka.localeCompare(kb) : (a.hora||"99:99").localeCompare(b.hora||"99:99");
-  });
-
-  const motoristasHoje = new Set(viagensHoje.map(function(r){ return r.m; })).size;
-  const pacientesHoje  = viagensHoje.reduce(function(s,r){ return s+(parseInt(r.pac)||0); }, 0);
-
-  document.getElementById("vkHoje").textContent      = viagensHoje.length    || "--";
-  document.getElementById("vkOntem").textContent     = viagensOntem.length   || "--";
-  document.getElementById("vkMots").textContent      = motoristasHoje        || "--";
-  document.getElementById("vkPac").textContent       = pacientesHoje         || "--";
-  document.getElementById("vkFuturas").textContent   = viagensFutura.length  || "--";
-  document.getElementById("vkHojeData").textContent  = hojeStr;
-  document.getElementById("vkOntemData").textContent = ontemStr;
-  document.getElementById("vkFuturasSub").textContent = viagensFutura.length === 1 ? "1 agendada" : viagensFutura.length+" agendadas";
-  document.getElementById("vSubtitle").textContent   = viagensHoje.length+" hoje · "+viagensOntem.length+" ontem";
-  document.getElementById("avisoPostagem").style.display = agora.getHours() >= 19 ? "flex" : "none";
-
-  // Cache para o filtro rápido: guarda todas e filtra na renderização
-  viagensCache = ordenarPorHora(viagensHoje).concat(ordenarPorHora(viagensOntem));
-  renderViagensTbody();
-
-  // Card de futuras
-  const cardFut = document.getElementById("cardFuturas");
-  if (!viagensFutura.length) { cardFut.style.display="none"; return; }
-  cardFut.style.display = "";
-  const DIAS_PT = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
-  let htmlFut = "", ultimaChave = "";
-  viagensFutura.forEach(function(r) {
-    const rKey = dtParaChave(r.dt);
-    if (rKey !== ultimaChave) {
-      ultimaChave = rKey;
-      const dp = r.dt.split("/");
-      const rData = new Date(parseInt(dp[2]),parseInt(dp[1])-1,parseInt(dp[0]));
-      const diasAte = Math.round((rData - refHoje)/864e5);
-      const sufixo = diasAte===1 ? "<span style='color:var(--p3);font-weight:800'>● AMANHÃ</span>" : "<span style='color:var(--muted)'>em "+diasAte+" dias</span>";
-      htmlFut += "<tr class='row-sep-data'><td colspan='7'><span style='color:var(--p3)'>"+DIAS_PT[rData.getDay()]+" · "+esc(r.dt)+"</span> &nbsp;"+sufixo+"</td></tr>";
-    }
-    const cor  = MCORE[r.m]||"#555";
-    const hora = r.hora ? '<span class="hora-badge" style="color:var(--p3)">'+esc(r.hora)+'</span>' : '<span style="color:var(--muted)">—</span>';
-    const pac  = parseInt(r.pac)>0 ? '<span class="pac-badge">'+esc(r.pac)+'</span>' : '<span style="color:var(--muted)">—</span>';
-    const obs  = r.obs ? '<span class="obs-txt">'+esc(r.obs)+'</span>' : "";
-    htmlFut += '<tr class="row-futuro"><td><span class="fut-badge">'+esc(formatarDiaMes(r.dt))+'</span></td>'
-      + '<td><div style="display:flex;align-items:center;gap:7px"><div class="av" style="background:'+cor+'18;color:'+cor+';border:1.5px solid '+cor+'50">'+esc(iniciais(r.m))+'</div><span style="font-weight:700;color:'+cor+';font-size:13px">'+esc(r.m)+'</span></div></td>'
-      + '<td><span class="dest-badge">📍 '+esc(r.d)+'</span></td><td><span class="placa-badge">'+esc(r.placa||"—")+'</span></td>'
-      + '<td>'+hora+'</td><td>'+pac+'</td><td>'+obs+'</td></tr>';
-  });
-  document.getElementById("futurasTbody").innerHTML = htmlFut;
-  const datasFut = [...new Set(viagensFutura.map(function(r){ return r.dt; }))];
-  document.getElementById("vFuturasSub").textContent = viagensFutura.length+" viagem"+(viagensFutura.length!==1?"s":"")+" · "+datasFut.length+" dia"+(datasFut.length!==1?"s":"");
-}
-
-function renderViagensTbody() {
-  const agora   = new Date();
-  const refHoje = new Date(agora);
-  if (agora.getHours() < 6) refHoje.setDate(refHoje.getDate()-1);
-  refHoje.setHours(0,0,0,0);
-  const hojeKey  = chaveData(refHoje);
-  const ontemData = new Date(refHoje); ontemData.setDate(refHoje.getDate()-1);
-  const ontemKey = chaveData(ontemData);
-
-  // Filtro por período (botões rápidos)
-  let base = VIAGENS.slice();
-  if (filtroAtual === "hoje") {
-    base = VIAGENS.filter(function(r){ return dtParaChave(r.dt)===hojeKey; });
-  } else if (filtroAtual === "ontem") {
-    base = VIAGENS.filter(function(r){ return dtParaChave(r.dt)===ontemKey; });
-  } else if (filtroAtual === "7dias") {
-    const seteDiasAtras = new Date(refHoje); seteDiasAtras.setDate(refHoje.getDate()-6);
-    const limiteKey = chaveData(seteDiasAtras);
-    base = VIAGENS.filter(function(r){ const k=dtParaChave(r.dt); return k>=limiteKey && k<=hojeKey; });
-  }
-  base.sort(function(a,b){ return dtParaChave(b.dt).localeCompare(dtParaChave(a.dt)) || (a.hora||"99:99").localeCompare(b.hora||"99:99"); });
-
-  // Filtro de texto
-  const busca = normalizar(document.getElementById("viagensSearch").value || "");
-  const filtrado = busca ? base.filter(function(r){
-    return normalizar(r.m).includes(busca)||normalizar(r.d).includes(busca)||normalizar(r.placa||"").includes(busca)||(r.dt||"").includes(busca);
-  }) : base;
-
-  if (!filtrado.length) {
-    document.getElementById("viagensTbody").innerHTML = '<tr><td colspan="7" class="empty">Nenhuma viagem encontrada para o período selecionado.</td></tr>';
-    return;
-  }
-
-  document.getElementById("viagensTbody").innerHTML = filtrado.map(function(r) {
-    const cor    = MCORE[r.m]||"#555";
-    const rKey   = dtParaChave(r.dt);
-    const eHoje  = rKey === hojeKey;
-    const eOntem = rKey === ontemKey;
-    const rowCls = eHoje ? "row-hoje" : eOntem ? "row-ontem" : "";
-    const diaLabel = eHoje
-      ? '<span style="color:var(--p1);font-weight:800;font-size:12px">● HOJE</span><br><span style="font-size:10px;color:var(--muted)">'+formatarDiaMes(r.dt)+'</span>'
-      : eOntem
-        ? '<span style="color:var(--p2);font-weight:700;font-size:12px">ONTEM</span><br><span style="font-size:10px;color:var(--muted)">'+formatarDiaMes(r.dt)+'</span>'
-        : '<span style="font-size:12px;font-weight:700;color:var(--muted)">'+esc(formatarDiaMes(r.dt))+'</span>';
-    const hora = r.hora ? '<span class="hora-badge">'+esc(r.hora)+'</span>' : '<span style="color:var(--muted)">—</span>';
-    const pac  = parseInt(r.pac)>0 ? '<span class="pac-badge">'+esc(r.pac)+'</span>' : '<span style="color:var(--muted)">—</span>';
-    const obs  = r.obs ? '<span class="obs-txt">'+esc(r.obs)+'</span>' : "";
-    return '<tr class="'+rowCls+'"><td>'+diaLabel+'</td>'
-      + '<td><div style="display:flex;align-items:center;gap:7px"><div class="av" style="background:'+cor+'18;color:'+cor+';border:1.5px solid '+cor+'50">'+esc(iniciais(r.m))+'</div><span style="font-weight:700;color:'+cor+';font-size:13px">'+esc(r.m)+'</span></div></td>'
-      + '<td><span class="dest-badge">📍 '+esc(r.d)+'</span></td><td><span class="placa-badge">'+esc(r.placa||"—")+'</span></td>'
-      + '<td>'+hora+'</td><td>'+pac+'</td><td>'+obs+'</td></tr>';
-  }).join("");
-}
-
-// ── Render Escala do Mês ──────────────────────────────────────────────────
-function renderEscala() {
-  const hojeKey = chaveData(new Date());
-  const dias = [];
-  const cur = new Date(ESC_INICIO);
-  while (cur <= ESC_FIM) {
-    dias.push({ date: new Date(cur), key: chaveData(cur), d: cur.getDate(), ds: DIAS_CURTOS[cur.getDay()] });
-    cur.setDate(cur.getDate()+1);
-  }
-  let htmlNomes = '<table class="esc-table"><thead><tr><th style="text-align:left;min-width:110px">Motorista</th></tr></thead><tbody>';
-  MOTS.forEach(function(m) {
-    const cor = MCORE[m.nome]||"#555";
-    htmlNomes += '<tr><td class="mc" style="color:'+cor+'" title="📱 '+esc(m.fone)+' · 🚐 '+esc(m.placa)+'">'+esc(m.nome)+'</td></tr>';
-  });
-  htmlNomes += '</tbody></table>';
-
-  let htmlDias = '<table class="esc-table"><thead><tr>';
-  dias.forEach(function(x) {
-    const eHoje = x.key===hojeKey;
-    htmlDias += '<th class="'+(eHoje?"eh":"")+'" style="'+(eHoje?"color:var(--p1)":"")+'">'+x.d+'<br><span style="font-size:8px;font-weight:400">'+x.ds+'</span></th>';
-  });
-  htmlDias += '</tr></thead><tbody>';
-  MOTS.forEach(function(m) {
-    htmlDias += '<tr>';
-    dias.forEach(function(x) {
-      const v     = m.escalaMap[x.key]||"";
-      const eHoje = x.key===hojeKey;
-      let badge   = "";
-      if      (v==="P1")      badge='<span class="ep1">P1</span>';
-      else if (v==="P2")      badge='<span class="ep2">P2</span>';
-      else if (v==="P3")      badge='<span class="ep3">P3</span>';
-      else if (v==="FERIAS")  badge='<span class="efe">FER</span>';
-      else if (v==="RECESSO") badge='<span class="ere">REC</span>';
-      const dica = v ? (m.nome+" · "+v+" · "+x.ds+" "+x.d) : "";
-      htmlDias += '<td style="'+(eHoje?"background:#f0faf6":"")+'"'+(dica?' onmouseenter="showTip(event,\''+esc(dica)+'\')" onmouseleave="hideTip()" onmousemove="moveTip(event)"':"")+'>'+ badge+'</td>';
-    });
-    htmlDias += '</tr>';
-  });
-  htmlDias += '</tbody></table>';
-
-  document.getElementById("escalaNomes").innerHTML = htmlNomes;
-  document.getElementById("escalaDias").innerHTML  = htmlDias;
-  document.getElementById("escalaSub").textContent = CONFIG.MES_LABEL+" · "+dias.length+" dias";
-}
-
-// ── Filtros ───────────────────────────────────────────────────────────────
-function getViagensFiltradas() {
-  return VIAGENS.filter(function(r) {
-    return (selMes.size===0||selMes.has(r.mes)) && (selMot.size===0||selMot.has(r.m)) && (selDest.size===0||selDest.has(r.d));
-  });
-}
-function resetFiltros() { selMes=new Set(); selMot=new Set(); selDest=new Set(); construirFiltros(); renderStats(); }
-
-function construirFiltros() {
-  const meses  = [...new Set(VIAGENS.map(function(r){ return r.mes; }))].sort();
-  const mots   = [...new Set(VIAGENS.map(function(r){ return r.m; }))].sort();
-  const dests  = [...new Set(VIAGENS.map(function(r){ return r.d; }))].sort();
-  function criarChips(idConteiner, itens, conjunto, clsAtivo, corFn) {
-    const el = document.getElementById(idConteiner); el.innerHTML="";
-    itens.slice(0,30).forEach(function(valor) {
-      const btn = document.createElement("button");
-      btn.className = "chip"+(conjunto.has(valor)?" "+clsAtivo:"");
-      btn.textContent = valor;
-      if (corFn && conjunto.has(valor)) corFn(btn, valor);
-      btn.addEventListener("click", function() {
-        if (conjunto.has(valor)) { conjunto.delete(valor); btn.className="chip"; btn.removeAttribute("style"); }
-        else { conjunto.add(valor); btn.className="chip "+clsAtivo; if (corFn) corFn(btn,valor); }
-        renderStats();
-      });
-      el.appendChild(btn);
-    });
-  }
-  criarChips("fMes", meses, selMes, "on", null);
-  criarChips("fMot", mots,  selMot, "on", function(btn,m){ const c=MCORE[m]||"#555"; btn.style.cssText="border-color:"+c+";color:"+c+";background:"+c+"18"; });
-  criarChips("fDest",dests, selDest,"ob", null);
-}
-
-// ── Render Estatísticas ───────────────────────────────────────────────────
-function renderStats() {
-  const viagens = getViagensFiltradas();
-
-  // Resultado do filtro
-  document.getElementById("fResult").innerHTML = '<span style="font-size:26px;font-weight:800;color:var(--p1)">'+viagens.length+'</span> <span style="font-size:13px;color:var(--muted)">viagens</span>';
-
-  // Agrupa por motorista
-  const porMotorista = {};
-  viagens.forEach(function(v) {
-    if (!porMotorista[v.m]) porMotorista[v.m] = { nome:v.m, cor:MCORE[v.m]||PALETA_CORES[0], ini:iniciais(v.m), viagens:0, pacientes:0, destinos:{} };
-    porMotorista[v.m].viagens++;
-    porMotorista[v.m].pacientes += (parseInt(v.pac)||0);
-    porMotorista[v.m].destinos[v.d] = (porMotorista[v.m].destinos[v.d]||0)+1;
-  });
-  const lista = Object.values(porMotorista).sort(function(a,b){ return b.viagens-a.viagens; });
-  lista.forEach(function(d) {
-    d.destPrincipal = Object.entries(d.destinos).sort(function(a,b){ return b[1]-a[1]; })[0]?.[0]||"";
-    d.eficiencia    = d.viagens > 0 ? (d.pacientes/d.viagens).toFixed(1) : "0.0";
-  });
-
-  const totalViagens = lista.reduce(function(s,d){ return s+d.viagens; },0);
-  const mediaViagens = lista.length ? totalViagens/lista.length : 0;
-  const totalPacientes = lista.reduce(function(s,d){ return s+d.pacientes; },0);
-  const eficienciaGeral = totalViagens > 0 ? (totalPacientes/totalViagens).toFixed(1) : "--";
-  const maxViagens = lista.length ? Math.max(...lista.map(function(d){ return d.viagens; })) : 0;
-  const minViagens = lista.length ? Math.min(...lista.map(function(d){ return d.viagens; })) : 0;
-  const periodo    = [...selMes].join(", ")||"Todos os meses";
-
-  // KPIs principais
-  document.getElementById("kT").textContent    = totalViagens;
-  document.getElementById("kP").textContent    = periodo;
-  document.getElementById("kA").textContent    = Math.round(mediaViagens);
-  document.getElementById("kEfic").textContent = eficienciaGeral;
-  document.getElementById("kTop").textContent  = maxViagens||"--";
-  document.getElementById("kTopN").textContent = lista[0]?.nome||"--";
-  document.getElementById("kV").textContent    = maxViagens-minViagens;
-  document.getElementById("tblSub").textContent = lista.length+" motoristas · "+periodo;
-  document.getElementById("donutN").textContent = totalViagens;
-  document.getElementById("destSub").textContent = new Set(viagens.map(function(r){ return r.d; })).size+" destinos";
-
-  if (!lista.length) {
-    ["drvTbody","destTbody","logTbody"].forEach(function(id){ document.getElementById(id).innerHTML='<tr><td colspan="7" class="empty">Nenhuma viagem encontrada.</td></tr>'; });
-    document.getElementById("heatWrap").innerHTML = '<div class="empty">Sem dados.</div>';
-    document.getElementById("semanaWrap").innerHTML = '<div class="empty">Sem dados.</div>';
-    document.getElementById("alertaOcioso").style.display = "none";
-    return;
-  }
-
-  // Alerta de motoristas ociosos (0 viagens no período)
-  const nomesComViagem = new Set(lista.map(function(d){ return d.nome; }));
-  const ociosos = MOTS.filter(function(m){ return !nomesComViagem.has(m.nome); });
-  const alertaOciosoEl = document.getElementById("alertaOcioso");
-  if (ociosos.length) {
-    alertaOciosoEl.style.display = "block";
-    alertaOciosoEl.innerHTML = '<div class="val-item val-warn" style="width:100%">'
-      + '💤 Motorista(s) sem viagem no período selecionado: '
-      + ociosos.map(function(m){ return '<strong>'+esc(m.nome)+'</strong>'; }).join(", ")
-      + ' — verifique se há oportunidade de melhor aproveitamento</div>';
-  } else {
-    alertaOciosoEl.style.display = "none";
-  }
-
-  // Ranking com carga de trabalho
-  document.getElementById("drvTbody").innerHTML = lista.map(function(d, i) {
-    const carga = classificarCarga(d.viagens, mediaViagens);
-    const barPct = maxViagens > 0 ? (d.viagens/maxViagens*100).toFixed(1) : 0;
-    return '<tr><td style="color:var(--muted);font-size:11px">'+(i+1)+'º</td>'
-      + '<td><div style="display:flex;align-items:center;gap:7px"><div class="av" style="background:'+d.cor+'18;color:'+d.cor+';border:1.5px solid '+d.cor+'50">'+esc(d.ini)+'</div>'
-      + '<div><div style="font-weight:600;font-size:13px">'+esc(d.nome)+'</div><div style="font-size:10px;color:var(--muted)">'+esc(d.destPrincipal)+'</div></div></div></td>'
-      + '<td><span class="n-big" style="color:'+d.cor+'">'+d.viagens+'</span></td>'
-      + '<td><div class="bar-row"><div class="bar-bg"><div class="bar-fill" style="width:'+barPct+'%;background:'+d.cor+'"></div></div><span class="bar-pct">'+(totalViagens>0?(d.viagens/totalViagens*100).toFixed(1):0)+'%</span></div></td>'
-      + '<td style="font-family:\'Barlow Condensed\',sans-serif;font-size:16px;font-weight:700;color:var(--purple)">'+d.eficiencia+'<span style="font-size:10px;color:var(--muted);font-family:\'Barlow\',sans-serif"> pac/via</span></td>'
-      + '<td><span class="carga-badge '+carga.cls+'">'+carga.label+'</span></td>'
-      + '<td style="font-size:11px;color:var(--muted)">'+esc(d.destPrincipal||"—")+'</td></tr>';
-  }).join("");
-
-  // Donut
-  const svg = document.getElementById("donutSvg");
-  const cx=65,cy=65,r=52,sw=14,circ=2*Math.PI*r;
-  svg.innerHTML="";
-  const circuloBase=document.createElementNS("http://www.w3.org/2000/svg","circle");
-  circuloBase.setAttribute("cx",cx);circuloBase.setAttribute("cy",cy);circuloBase.setAttribute("r",r);
-  circuloBase.setAttribute("fill","none");circuloBase.setAttribute("stroke","#e8eef4");circuloBase.setAttribute("stroke-width",sw);
-  svg.appendChild(circuloBase);
-  let offset=0;
-  lista.forEach(function(d) {
-    const pct=d.viagens/totalViagens, dash=pct*circ;
-    const circulo=document.createElementNS("http://www.w3.org/2000/svg","circle");
-    circulo.setAttribute("cx",cx);circulo.setAttribute("cy",cy);circulo.setAttribute("r",r);
-    circulo.setAttribute("fill","none");circulo.setAttribute("stroke",d.cor);circulo.setAttribute("stroke-width",sw);
-    circulo.setAttribute("stroke-dasharray",Math.max(0,dash-1)+" "+(circ-Math.max(0,dash-1)));
-    circulo.setAttribute("stroke-dashoffset",-offset*circ);
-    svg.appendChild(circulo);
-    offset+=pct;
-  });
-  document.getElementById("donutLeg").innerHTML = lista.slice(0,8).map(function(d) {
-    return '<div class="li"><div class="ll"><div class="ld" style="background:'+d.cor+'"></div><span class="ln">'+esc(d.nome.split(" ")[0])+'</span></div>'
-      + '<div class="lr"><span class="lp" style="color:'+d.cor+'">'+(d.viagens/totalViagens*100).toFixed(1)+'%</span><span class="lt">'+d.viagens+'v</span></div></div>';
-  }).join("");
-
-  // Demanda por dia da semana
-  const porDiaSemana = [0,0,0,0,0,0,0]; // Dom=0 … Sáb=6
-  const contDiaSemana= [0,0,0,0,0,0,0];
-  viagens.forEach(function(v) {
-    if (!v.dt||!v.dt.includes("/")) return;
-    const p = v.dt.split("/");
-    const data = new Date(parseInt(p[2]),parseInt(p[1])-1,parseInt(p[0]));
-    const dow = data.getDay();
-    porDiaSemana[dow]++;
-    contDiaSemana[dow]++;
-  });
-  const maxDia = Math.max(...porDiaSemana, 1);
-  const NOMES_DIA = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
-  const CORES_DIA = ["#e8eef4","#0a7c55","#0a7c55","#0a7c55","#0a7c55","#0a7c55","#e8eef4"];
-  document.getElementById("semanaWrap").innerHTML = NOMES_DIA.map(function(nd, i) {
-    const total  = porDiaSemana[i];
-    const altura = Math.max(4, Math.round(total/maxDia*72));
-    return '<div class="dia-sem-col">'
-      + '<div class="dia-sem-label">'+nd+'</div>'
-      + '<div class="dia-sem-bar-wrap"><div class="dia-sem-bar" style="height:'+altura+'px;background:'+CORES_DIA[i]+'" '
-        + 'onmouseenter="showTip(event,\'<b>'+nd+'</b><br>'+total+' viagens\')" onmouseleave="hideTip()" onmousemove="moveTip(event)">'
-        + '</div></div>'
-      + '<div class="dia-sem-val">'+total+'</div>'
-      + '<div style="font-size:9px;color:var(--muted)">viagens</div>'
-      + '</div>';
-  }).join("");
-
-  // Mapa de calor
-  const porDestino = {};
-  viagens.forEach(function(r){ porDestino[r.d]=(porDestino[r.d]||0)+1; });
-  const topDestinos = Object.entries(porDestino).sort(function(a,b){ return b[1]-a[1]; }).slice(0,10).map(function(e){ return e[0]; });
-  const maxCalor = Math.max(...lista.flatMap(function(d){ return topDestinos.map(function(dest){ return d.destinos[dest]||0; }); }),1);
-  let htmlCalor = '<div class="heat-hdr">'+topDestinos.map(function(d){ return '<span title="'+esc(d)+'">'+esc(d)+'</span>'; }).join("")+'</div>';
-  lista.forEach(function(d) {
-    htmlCalor += '<div class="heat-row"><div class="heat-lbl">'+esc(d.nome.split(" ")[0])+'</div>';
-    topDestinos.forEach(function(dest) {
-      const v = d.destinos[dest]||0;
-      const opacidade = v>0 ? Math.min(1,.3+v/maxCalor*.7) : .08;
-      htmlCalor += '<div class="heat-cell" style="'+(v>0?"background:"+d.cor+";opacity:"+opacidade:"background:var(--s3)")+'"'
-        + ' onmouseenter="showTip(event,\'<b>'+esc(d.nome)+'</b> → '+esc(dest)+'<br>'+v+' viagens\')" onmouseleave="hideTip()" onmousemove="moveTip(event)">'+(v||"")+'</div>';
-    });
-    htmlCalor += "</div>";
-  });
-  document.getElementById("heatWrap").innerHTML = htmlCalor;
-
-  // Destinos
-  const entDest = Object.entries(porDestino).sort(function(a,b){ return b[1]-a[1]; });
-  const maxDest = entDest[0]?.[1]||1;
-  const totDest = entDest.reduce(function(s,e){ return s+e[1]; },0);
-  document.getElementById("destTbody").innerHTML = entDest.map(function([dest,total]) {
-    return '<tr><td style="font-weight:600">📍 '+esc(dest)+'</td>'
-      + '<td style="font-family:\'Barlow Condensed\',sans-serif;font-size:18px;font-weight:800;color:var(--p2)">'+total+'</td>'
-      + '<td><div class="bar-row"><div class="bar-bg"><div class="bar-fill" style="width:'+(total/maxDest*100).toFixed(1)+'%;background:var(--p2)"></div></div>'
-      + '<span class="bar-pct">'+(total/totDest*100).toFixed(1)+'%</span></div></td></tr>';
-  }).join("");
-
-  // Log
-  logRowsCache = [...viagens].sort(function(a,b){ return b.dt.split("/").reverse().join("").localeCompare(a.dt.split("/").reverse().join("")); });
-  renderLog();
-}
-
-function renderLog() {
-  const busca = normalizar(document.getElementById("logSearch").value||"");
-  const filtrado = busca ? logRowsCache.filter(function(r){ return normalizar(r.m).includes(busca)||normalizar(r.d).includes(busca)||normalizar(r.placa||"").includes(busca)||r.dt.includes(busca); }) : logRowsCache;
-  document.getElementById("logSub").textContent = filtrado.length<logRowsCache.length
-    ? "exibindo "+Math.min(filtrado.length,300)+" de "+filtrado.length+" (total: "+logRowsCache.length+")"
-    : filtrado.length+" viagens";
-  document.getElementById("logTbody").innerHTML = filtrado.slice(0,300).map(function(r) {
-    const cor = MCORE[r.m]||"#555";
-    return '<tr><td style="color:var(--muted);font-size:12px">'+esc(r.dt)+'</td>'
-      + '<td><div style="display:flex;align-items:center;gap:7px"><div class="av" style="background:'+cor+'18;color:'+cor+';border:1.5px solid '+cor+'50">'+esc(iniciais(r.m))+'</div><span style="font-weight:600;color:'+cor+'">'+esc(r.m)+'</span></div></td>'
-      + '<td>📍 '+esc(r.d)+'</td><td><span class="vb">'+esc(r.placa||"—")+'</span></td>'
-      + '<td><span class="hv">'+esc(r.hora||"—")+'</span></td>'
-      + '<td style="font-size:11px;color:var(--gold)">'+esc(r.obs)+'</td></tr>';
-  }).join("");
-}
-
-// ── CSV / Fetch ───────────────────────────────────────────────────────────
-function dividirCSV(linha) {
-  const partes=[]; let atual="",dentroAspas=false;
-  for (const c of linha) {
-    if (c==='"') { dentroAspas=!dentroAspas; }
-    else if (c===','&&!dentroAspas) { partes.push(atual.trim()); atual=""; }
-    else atual+=c;
-  }
-  partes.push(atual.trim());
-  return partes.map(function(v){ return v.replace(/^"|"$/g,"").trim(); });
-}
-
-function agendarFetch(delay) {
-  if (fetchTimer) clearTimeout(fetchTimer);
-  nextFetch = Date.now()+delay;
-  fetchTimer = setTimeout(fetchViagens, delay);
-}
-
-async function fetchViagens() {
-  if (fetchTimer) clearTimeout(fetchTimer);
-  const b = document.getElementById("banner");
-  b.style.display = "flex";
-  b.innerHTML = '<span style="color:var(--p1)">⏳ Buscando registro de viagens...</span>';
-  try {
-    const res = await fetch(CONFIG.VIAGENS_URL+"&cb="+Date.now(), { cache:"no-store" });
-    if (!res.ok) throw new Error("HTTP "+res.status);
-    const texto = await res.text();
-    const resultado = [];
-    for (const linha of texto.split(/\r?\n/)) {
-      const p = dividirCSV(linha);
-      if (p.length<4) continue;
-      const placa=p[0], motorista=p[1].toUpperCase(), destino=p[2], hora=p[3];
-      let dt=p[4]||""; const pac=p[5]||"", obs=p[6]||"";
-      if (!motorista||motorista==="MOTORISTA"||!destino||!dt.includes("/")) continue;
-      const dp=dt.split("/");
-      if (dp.length===3&&dp[2].length===2) dt=dp[0]+"/"+dp[1]+"/20"+dp[2];
-      const mn=parseInt(dp[1]||0);
-      resultado.push({ placa, m:motorista, d:destino, hora, dt, pac, obs, mes:mn>=1&&mn<=12?MES_NOMES[mn]:"?" });
-    }
-    resultado.sort(function(a,b){ return b.dt.split("/").reverse().join("").localeCompare(a.dt.split("/").reverse().join("")); });
-    VIAGENS = resultado;
-    [...new Set(resultado.map(function(v){ return v.m; }))].sort().forEach(function(m,i){ if(!MCORE[m]) MCORE[m]=PALETA_CORES[i%PALETA_CORES.length]; });
-    construirFiltros(); renderStats(); renderViagens(); renderExecBar(); renderSugestao();
-    b.innerHTML = '<span style="color:var(--p1)">🟢 '+resultado.length+' viagens carregadas · '+new Date().toLocaleTimeString("pt-BR")+'</span>'
-      + ' &nbsp;<button class="btn" id="btnBannerNow" style="font-size:10px;padding:3px 10px">⟳ Atualizar agora</button>';
-    document.getElementById("btnBannerNow").addEventListener("click", fetchViagens);
-    agendarFetch(REFRESH_MS);
-  } catch(err) {
-    b.innerHTML = '<span style="color:var(--p2)">⚠️ Erro ao carregar viagens: '+esc(err.message)+'</span>'
-      + ' &nbsp;<button class="btn" id="btnBannerRetry" style="font-size:10px;padding:3px 10px">⟳ Tentar novamente</button>';
-    document.getElementById("btnBannerRetry").addEventListener("click", fetchViagens);
-    agendarFetch(30000);
-  }
-}
-
-// ── Init ─────────────────────────────────────────────────────────────────
-function inicializar() {
-  document.getElementById("footerUTI").textContent  = CONFIG.VEICULOS_UTI||"—";
-  document.getElementById("footerFone").textContent = CONFIG.FONE_TRANSPORTE||"—";
-  renderValBanner();
-  renderPlantao();
-  renderEscala();
-  fetchViagens();
-}
-
-document.addEventListener("DOMContentLoaded", function() {
-  document.querySelectorAll(".tab-btn").forEach(function(btn) {
-    btn.addEventListener("click", function() { switchTab(btn.dataset.tab); });
-  });
-  document.getElementById("btnAtualizar").addEventListener("click", function() {
-    renderValBanner(); renderPlantao(); renderEscala(); fetchViagens();
-  });
-  document.getElementById("btnResetF").addEventListener("click", resetFiltros);
-  document.getElementById("logSearch").addEventListener("input", renderLog);
-  document.getElementById("viagensSearch").addEventListener("input", renderViagensTbody);
-  document.addEventListener("visibilitychange", function() {
-    if (document.visibilityState==="hidden") { if(fetchTimer) clearTimeout(fetchTimer); }
-    else { const r=nextFetch ? nextFetch-Date.now():0; agendarFetch(r>1000?r:0); }
-  });
-  inicializar();
-});
-</script>
+<!-- ══ SCRIPTS — config primeiro, depois a lógica ══ -->
+<script src="js/config.js"></script>
+<script src="js/app.js"></script>
 </body>
 </html>
