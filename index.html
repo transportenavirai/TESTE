@@ -3,182 +3,106 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hospital Municipal · Escala de Motoristas</title>
+  <title>GMS · Transparência de Motoristas</title>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="/TESTE/css/style.css">
 </head>
 <body>
+
+<!-- ══ TELA DE CARREGAMENTO ══ -->
+<div id="loadingScreen">
+  <div class="load-ico">🚐</div>
+  <div class="load-txt">CARREGANDO DADOS</div>
+  <div class="load-sub">Buscando planilha em tempo real...</div>
+</div>
+
+<!-- ══ TELA DE ERRO ══ -->
+<div id="errorScreen">
+  <div style="font-size:48px">⚠️</div>
+  <h2>Não foi possível carregar</h2>
+  <p id="errorMsg">Verifique se a planilha está publicada como CSV.</p>
+  <button class="btn" id="btnRetryErr" style="margin-top:8px;font-size:13px;padding:8px 20px">⟳ Tentar novamente</button>
+</div>
+
+<!-- ══ CONTEÚDO PRINCIPAL ══ -->
+<div id="mainContent" style="display:none">
 <div class="page">
 
-  <!-- ══ CABEÇALHO ══ -->
+  <!-- ── CABEÇALHO ── -->
   <header>
     <div class="brand">
-      <div class="brand-ico">🏥</div>
+      <div class="brand-ico">🚐</div>
       <div class="brand-text">
-        <h1>HOSPITAL MUNICIPAL · ESCALA DE MOTORISTAS</h1>
-        <p id="hdrSub">Gerência de Transporte · Naviraí-MS · Escala 24h×72h · Marcio Castro</p>
+        <h1>GMS · PAINEL DE TRANSPARÊNCIA</h1>
+        <p>Marcio Castro · Prefeitura de Naviraí</p>
       </div>
     </div>
     <div class="hdr-right">
-      <span class="tag tag-live"><span class="live-dot"></span>AO VIVO</span>
-      <button class="btn" id="btnAtualizar">⟳ Atualizar</button>
+      <span class="tag tag-live" id="statusTag"><span class="live-dot"></span>TEMPO REAL</span>
+      <button class="btn" id="btnResetFilters">✕ Limpar filtros</button>
+      <button class="btn btn-export" id="btnExportCSV">📥 Exportar CSV</button>
       <button class="btn" onclick="window.print()">🖨️ Imprimir</button>
+      <button class="btn" id="btnRefresh">⟳ Atualizar</button>
     </div>
   </header>
 
-  <!-- ══ BANNERS ══ -->
-  <div id="alertaPeriodo"></div>
-  <div id="valBanner" class="val-banner"></div>
   <div id="banner"></div>
 
-  <!-- ══ ABAS ══ -->
+  <!-- ── ABAS ── -->
   <div class="tabs">
-    <button class="tab-btn active" data-tab="plantao">🟢 Plantão de Hoje</button>
-    <button class="tab-btn" data-tab="viagens">🚐 Viagens</button>
-    <button class="tab-btn" data-tab="escala">📅 Escala do Mês</button>
-    <button class="tab-btn" data-tab="stats">📊 Estatísticas</button>
-  </div>
-
-  <!-- ══ ABA: PLANTÃO ══ -->
-  <div class="tab-panel active" id="panelPlantao">
-    <div class="date-banner">
-      <div>
-        <div class="date-hoje" id="dateHoje">--</div>
-        <div class="date-sub" id="dateSub">--</div>
-      </div>
-      <div class="regras-box">
-        <div class="regra">🚫 Após 14h — viagens &gt;160km · Não acionar quem entra plantão dia seguinte</div>
-        <div class="regra">🚫 Após 19h — nenhum acionamento a quem irá entrar de plantão</div>
-        <div id="regraHora" class="regra-hora"></div>
-      </div>
-    </div>
-
-    <div class="sec-title">🟢 Plantão de Hoje</div>
-    <div class="plantao-grid" id="plantaoGrid"></div>
-
-    <div class="card">
-      <div class="card-hd">
-        <h3>📅 PRÓXIMOS 7 DIAS</h3>
-        <span>escala vigente</span>
-      </div>
-      <div style="overflow-x:auto">
-        <table class="dt">
-          <thead>
-            <tr>
-              <th>Data</th>
-              <th>Dia</th>
-              <th>P1 — Plantão</th>
-              <th>P2 — 2ª viagem</th>
-              <th>P3 — 1ª Viagem</th>
-              <th>Indisponíveis</th>
-            </tr>
-          </thead>
-          <tbody id="proxTbody"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══ ABA: VIAGENS ══ -->
-  <div class="tab-panel" id="panelViagens">
-    <div class="viagens-kpis" style="grid-template-columns:repeat(5,1fr)">
-      <div class="kpi c0"><div class="kpi-lbl">Viagens Hoje</div><div class="kpi-val" id="vkHoje">--</div><div class="kpi-sub" id="vkHojeData">--</div></div>
-      <div class="kpi c1"><div class="kpi-lbl">Viagens Ontem</div><div class="kpi-val" id="vkOntem">--</div><div class="kpi-sub" id="vkOntemData">--</div></div>
-      <div class="kpi c2"><div class="kpi-lbl">Motoristas Hoje</div><div class="kpi-val" id="vkMots">--</div><div class="kpi-sub">em serviço hoje</div></div>
-      <div class="kpi c3"><div class="kpi-lbl">Pacientes Hoje</div><div class="kpi-val" id="vkPac">--</div><div class="kpi-sub">total transportados</div></div>
-      <div class="kpi c2"><div class="kpi-lbl">Próximas Viagens</div><div class="kpi-val" id="vkFuturas">--</div><div class="kpi-sub" id="vkFuturasSub">agendadas</div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-hd">
-        <h3>🚐 VIAGENS DE ONTEM E HOJE</h3>
-        <span id="vSubtitle">--</span>
-      </div>
-      <div class="log-toolbar">
-        <input class="viagens-search" id="viagensSearch" type="text" placeholder="🔍  Buscar motorista, destino, placa...">
-      </div>
-      <div style="overflow-x:auto">
-        <table class="vt">
-          <thead>
-            <tr>
-              <th>Dia</th><th>Motorista</th><th>Destino</th>
-              <th>Placa</th><th>Saída</th><th>Pacientes</th><th>Obs</th>
-            </tr>
-          </thead>
-          <tbody id="viagensTbody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="aviso-postagem" id="avisoPostagem" style="display:none">
-      📋 Viagens postadas após 19h aparecem aqui imediatamente e ficam visíveis para o grupo.
-      Elas passam para "hoje" automaticamente à meia-noite.
-    </div>
-
-    <div class="card" id="cardFuturas" style="display:none">
-      <div class="card-hd">
-        <h3>📋 PRÓXIMAS VIAGENS AGENDADAS</h3>
-        <span id="vFuturasSub">--</span>
-      </div>
-      <div style="overflow-x:auto">
-        <table class="vt">
-          <thead>
-            <tr>
-              <th>Data</th><th>Motorista</th><th>Destino</th>
-              <th>Placa</th><th>Saída</th><th>Pacientes</th><th>Obs</th>
-            </tr>
-          </thead>
-          <tbody id="futurasTbody"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══ ABA: ESCALA DO MÊS ══ -->
-  <div class="tab-panel" id="panelEscala">
-    <div class="card-scroll">
-      <div class="card-hd">
-        <h3>📅 ESCALA COMPLETA DO MÊS</h3>
-        <span id="escalaSub">--</span>
-      </div>
-      <div class="esc-outer">
-        <div class="esc-fixed"><div id="escalaNomes"></div></div>
-        <div class="esc-scroll"><div id="escalaDias"></div></div>
-      </div>
-    </div>
+    <button class="tab-btn active" id="tabEstatisticas">📊 Estatísticas</button>
+    <button class="tab-btn"        id="tabEscala">📅 Escala do Dia</button>
   </div>
 
   <!-- ══ ABA: ESTATÍSTICAS ══ -->
-  <div class="tab-panel" id="panelStats">
+  <div class="tab-panel active" id="panelEstatisticas">
+
+    <!-- Filtros -->
     <div class="filters-wrap">
-      <div class="filters-title">
-        🔍 Filtros &nbsp;
-        <button class="btn" id="btnResetF" style="font-size:10px;padding:3px 10px">✕ Limpar</button>
-      </div>
-      <div class="fg">
-        <div><label>Mês</label><div class="chips" id="fMes"></div></div>
-        <div><label>Motorista</label><div class="chips" id="fMot"></div></div>
-        <div><label>Destino</label><div class="chips" id="fDest"></div></div>
-        <div style="align-self:end">
-          <label>Resultado</label>
-          <div id="fResult" style="font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:800;color:var(--p1)">--</div>
+      <div class="filters-title">🔍 Filtros interativos — clique para selecionar</div>
+      <div class="filters-grid">
+        <div class="filter-group"><label>Mês</label><div class="chips" id="fMes"></div></div>
+        <div class="filter-group"><label>Semana</label><div class="chips" id="fSem"></div></div>
+        <div class="filter-group"><label>Motorista</label><div class="chips" id="fMot"></div></div>
+        <div class="filter-group"><label>Veículo</label><div class="chips" id="fVei"></div></div>
+        <div class="filter-group" style="align-self:end">
+          <label>Resultado filtrado</label>
+          <div id="fResult" style="font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:800;color:var(--accent)">
+            -- <span style="font-size:13px;color:var(--muted);font-family:'Barlow',sans-serif;font-weight:400">viagens</span>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="kpis">
-      <div class="kpi c0"><div class="kpi-lbl">Total Viagens</div><div class="kpi-val" id="kT">--</div><div class="kpi-sub" id="kP">--</div></div>
-      <div class="kpi c1"><div class="kpi-lbl">Média / Motorista</div><div class="kpi-val" id="kA">--</div><div class="kpi-sub">viagens/pessoa</div></div>
-      <div class="kpi c2"><div class="kpi-lbl">Destinos</div><div class="kpi-val" id="kD">--</div><div class="kpi-sub">rotas diferentes</div></div>
-      <div class="kpi c3"><div class="kpi-lbl">Mais Viagens</div><div class="kpi-val" id="kTop">--</div><div class="kpi-sub" id="kTopN">--</div></div>
-      <div class="kpi c4"><div class="kpi-lbl">Variação Máxima</div><div class="kpi-val" id="kV">--</div><div class="kpi-sub">entre motoristas</div></div>
+    <!-- Equidade -->
+    <div class="eq-banner">
+      <div class="eq-left">
+        <h2>⚖️ ÍNDICE DE EQUIDADE</h2>
+        <p>Variação entre motoristas no período filtrado.
+           <strong style="color:var(--gold)">Não conta: Rural, Hemodiálise, Malote, Disponível, Trânsito.</strong>
+        </p>
+      </div>
+      <div>
+        <div class="eq-score" id="eqScore">--</div>
+        <div class="eq-score-sub" id="eqScoreSub">/ 100</div>
+      </div>
     </div>
 
+    <!-- KPIs -->
+    <div class="kpis">
+      <div class="kpi c0"><div class="kpi-ico">🚐</div><div class="kpi-lbl">Total de Viagens</div><div class="kpi-val" id="kT">--</div><div class="kpi-sub" id="kP">--</div></div>
+      <div class="kpi c1"><div class="kpi-ico">👤</div><div class="kpi-lbl">Média / Motorista</div><div class="kpi-val" id="kA">--</div><div class="kpi-sub">viagens/pessoa</div></div>
+      <div class="kpi c2"><div class="kpi-ico">📍</div><div class="kpi-lbl">Destinos</div><div class="kpi-val" id="kD">--</div><div class="kpi-sub">rotas diferentes</div></div>
+      <div class="kpi c3"><div class="kpi-ico">🏆</div><div class="kpi-lbl">Mais Viagens</div><div class="kpi-val" id="kTop">--</div><div class="kpi-sub" id="kTopN">--</div></div>
+      <div class="kpi c4"><div class="kpi-ico">📊</div><div class="kpi-lbl">Variação Máxima</div><div class="kpi-val" id="kV">--</div><div class="kpi-sub">entre motoristas</div></div>
+    </div>
+
+    <!-- Ranking + Donut -->
     <div class="row2">
       <div class="card">
-        <div class="card-hd"><h3>📋 RANKING</h3><span id="tblSub">--</span></div>
+        <div class="card-hd"><h3>📋 RANKING POR MOTORISTA</h3><span id="tblSub">--</span></div>
         <table class="dt">
-          <thead><tr><th>#</th><th>Motorista</th><th>Viagens</th><th>Part.</th><th>Destino Principal</th><th>vs Média</th></tr></thead>
+          <thead><tr><th>#</th><th>Motorista</th><th>Viagens</th><th>Participação</th><th>Destino Principal</th><th>Veículo Principal</th><th>vs Média</th></tr></thead>
           <tbody id="drvTbody"></tbody>
         </table>
       </div>
@@ -186,57 +110,131 @@
         <div class="card-hd"><h3>🥧 DISTRIBUIÇÃO</h3><span>% por motorista</span></div>
         <div class="donut-wrap">
           <div class="donut-rel">
-            <svg class="dn" width="130" height="130" viewBox="0 0 130 130" id="donutSvg"></svg>
-            <div class="dn-c"><div class="dn-n" id="donutN">--</div><div class="dn-l">viagens</div></div>
+            <svg class="dn" width="140" height="140" viewBox="0 0 140 140" id="donutSvg"></svg>
+            <div class="dn-center"><div class="dn-num" id="donutN">--</div><div class="dn-lbl">viagens</div></div>
           </div>
           <div class="legend" id="donutLeg"></div>
         </div>
       </div>
     </div>
 
+    <!-- Equidade individual -->
+    <div class="eq-sec">
+      <div class="eq-sec-hd">
+        <h3>⚖️ EQUIDADE INDIVIDUAL</h3>
+        <span>🟢 acima · 🔴 abaixo · média = <span id="avgLbl">--</span> viagens</span>
+      </div>
+      <div class="eq-grid" id="eqGrid"></div>
+    </div>
+
+    <!-- Heatmap + Semanal -->
     <div class="row3">
       <div class="card">
         <div class="card-hd"><h3>🔥 MAPA DE CALOR · MOTORISTA × DESTINO</h3><span>nº viagens</span></div>
         <div class="heat-wrap" id="heatWrap"></div>
       </div>
       <div class="card">
+        <div class="card-hd"><h3>📈 EVOLUÇÃO SEMANAL</h3><span>viagens/semana</span></div>
+        <div class="wchart-wrap">
+          <div class="wchart-bars" id="wChart"></div>
+          <div class="wchart-legend" id="wLeg"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Destinos + Veículos -->
+    <div class="row3">
+      <div class="card">
         <div class="card-hd"><h3>📍 VIAGENS POR DESTINO</h3><span id="destSub">--</span></div>
-        <table class="dt">
-          <thead><tr><th>Destino</th><th>Total</th><th>Distribuição</th></tr></thead>
+        <table class="dest">
+          <thead><tr><th>Destino</th><th>Total</th><th>Distribuição</th><th>Motoristas</th></tr></thead>
           <tbody id="destTbody"></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-hd"><h3>🚗 VIAGENS POR VEÍCULO</h3><span id="veiSub">--</span></div>
+        <table class="dest">
+          <thead><tr><th>Veículo</th><th>Total</th><th>Distribuição</th><th>Motoristas</th></tr></thead>
+          <tbody id="veiTbody"></tbody>
         </table>
       </div>
     </div>
 
-    <div class="card">
-      <div class="card-hd"><h3>📄 REGISTRO DE VIAGENS</h3><span id="logSub">--</span></div>
+    <!-- Log -->
+    <div class="card" style="margin-bottom:14px">
+      <div class="card-hd">
+        <h3>📄 LOG DE VIAGENS FILTRADAS</h3>
+        <span id="logSub">--</span>
+      </div>
       <div class="log-toolbar">
-        <input class="log-search" id="logSearch" type="text" placeholder="🔍  Buscar motorista, destino, placa...">
+        <input class="log-search" id="logSearch" type="text" placeholder="🔍  Buscar por motorista, destino, veículo...">
+        <button class="btn btn-export" id="btnExportLog" style="white-space:nowrap;font-size:10px;padding:4px 10px">📥 Exportar filtrado</button>
       </div>
       <div class="log-wrap">
         <table class="log">
-          <thead><tr><th>Data</th><th>Motorista</th><th>Destino</th><th>Placa</th><th>Hora</th><th>Obs</th></tr></thead>
+          <thead><tr><th>Data</th><th>Motorista</th><th>Destino</th><th>Veículo</th><th>Mês</th><th>Semana</th></tr></thead>
           <tbody id="logTbody"></tbody>
         </table>
       </div>
     </div>
-  </div>
 
-  <!-- ══ RODAPÉ ══ -->
+  </div><!-- fim panelEstatisticas -->
+
+  <!-- ══ ABA: ESCALA DO DIA ══ -->
+  <div class="tab-panel" id="panelEscala">
+
+    <div class="escala-header">
+      <div>
+        <div class="escala-titulo">📅 ESCALA DO DIA</div>
+        <div class="escala-sub">Viagens de hoje e próximas · atualiza automaticamente com a planilha</div>
+      </div>
+      <div id="escalaInfo" style="font-size:11px;color:var(--muted)"></div>
+    </div>
+
+    <!-- KPIs da escala -->
+    <div class="escala-kpis">
+      <div class="escala-kpi ck0"><div class="escala-kpi-val" id="ekTotal">--</div><div class="escala-kpi-lbl">Motoristas</div></div>
+      <div class="escala-kpi ck1"><div class="escala-kpi-val" id="ekAtivos">--</div><div class="escala-kpi-lbl">Em Serviço</div></div>
+      <div class="escala-kpi ck2"><div class="escala-kpi-val" id="ekDest">--</div><div class="escala-kpi-lbl" id="ekDestLbl">Viagens</div></div>
+      <div class="escala-kpi ck3"><div class="escala-kpi-val" id="ekPac">--</div><div class="escala-kpi-lbl" id="ekPacLbl">Pacientes</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-hd">
+        <h3>🗓️ ESCALA DE VIAGENS</h3>
+        <span id="escalaCount" style="color:var(--muted);font-size:10px">--</span>
+      </div>
+      <div style="overflow-x:auto">
+        <table id="escalaTable">
+          <thead>
+            <tr>
+              <th>Data</th><th>Motorista</th><th>Veículo</th>
+              <th>Destino</th><th>Saída</th><th>Pacientes</th><th>Obs</th>
+            </tr>
+          </thead>
+          <tbody id="escalaTbody">
+            <tr><td colspan="7" style="padding:40px;text-align:center;color:var(--muted)">⏳ Carregando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- fim panelEscala -->
+
+  <!-- ── RODAPÉ ── -->
   <footer>
-    <p>🔒 Painel de Transparência · HMN · Gerência de Transporte · Marcio Castro · Escala 24h×72h
-       &nbsp;·&nbsp; UTI: <span id="footerUTI">--</span>
-       &nbsp;·&nbsp; Transporte: <span id="footerFone">--</span>
-    </p>
+    <p>🔒 Painel 100% transparente · GMS · Prefeitura de Naviraí · Marcio Castro</p>
     <p id="tsLbl"></p>
   </footer>
+
 </div>
+</div><!-- fim mainContent -->
 
 <!-- Tooltip global -->
 <div id="tip"></div>
 
 <!-- ══ SCRIPTS — config primeiro, depois a lógica ══ -->
-<script src="js/config.js"></script>
-<script src="js/app.js"></script>
+<script src="/TESTE/js/config.js"></script>
+<script src="/TESTE/js/app.js"></script>
 </body>
 </html>
