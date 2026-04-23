@@ -8,7 +8,7 @@
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQI6auY_9xHSJGEj2yjUXBCGyx3K9acP3qRApIm6EqTuXw6rtd6BArAH12OAJx8HtRqvpbDsiawgbc2/pub?gid=936830313&single=true&output=csv";
 
 // ── INTERVALOS DE ATUALIZAÇÃO ──
-const REFRESH_MS = 60 * 1000;  // Atualização automática: 60 segundos
+const REFRESH_MS = 30 * 1000;  // Atualização automática: 60 segundos
 const RETRY_MS   = 10 * 1000;  // Retry em caso de erro:  10 segundos
 const MAX_RETRY  = 5;           // Máximo de tentativas antes de desistir
 
