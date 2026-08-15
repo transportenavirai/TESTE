@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GMS · Painel Unificado de Transporte</title>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+<div id="loadingScreen"><div class="load-ico">🚐</div><div class="load-txt">CARREGANDO GMS</div><div class="load-sub">Conectando às planilhas em tempo real...</div></div>
+<div id="errorScreen"><div class="error-ico">⚠️</div><h2>Não foi possível carregar os dados</h2><p id="errorMsg">Verifique se as planilhas estão publicadas como CSV.</p><button class="btn" id="btnRetryErr">⟳ Tentar novamente</button></div>
+
+<div id="mainContent" class="hidden">
+<div class="page">
+<header>
+  <div class="brand"><div class="brand-ico">🚐</div><div class="brand-text"><h1>GMS · PAINEL DE TRANSPARÊNCIA</h1><p>Gerência de Transporte · Prefeitura de Naviraí · Marcio Castro</p></div></div>
+  <div class="hdr-right"><span class="tag tag-live" id="statusTag"><span class="live-dot"></span>AO VIVO</span><button class="btn" id="btnRefresh">⟳ Atualizar</button><button class="btn" onclick="window.print()">🖨️ Imprimir</button></div>
+</header>
+<div id="alertaPeriodo"></div><div id="valBanner" class="val-banner"></div><div id="banner"></div>
+
+<nav class="tabs" aria-label="Seções do dashboard">
+  <button class="tab-btn active" data-tab="visao">🏠 Visão Geral</button>
+  <button class="tab-btn" data-tab="plantao">🟢 Plantão</button>
+  <button class="tab-btn" data-tab="viagens">🚐 Viagens</button>
+  <button class="tab-btn" data-tab="escala">📅 Escala</button>
+  <button class="tab-btn" data-tab="stats">📊 Estatísticas</button>
+</nav>
+
+<!-- VISÃO GERAL -->
+<section class="tab-panel active" id="panelVisao">
+  <div class="date-banner"><div><div class="date-hoje" id="vgData">--</div><div class="date-sub" id="vgSub">--</div></div><div class="regras-box"><div class="regra">🚫 Após 14h — viagens acima de 160 km</div><div class="regra">🚫 Após 19h — nenhum acionamento de quem entra no plantão</div><div id="vgRegraHora" class="regra-hora"></div></div></div>
+  <div class="kpis kpis-6">
+    <div class="kpi c0"><div class="kpi-lbl">Viagens Hoje</div><div class="kpi-val" id="vgViagens">--</div><div class="kpi-sub">registros operacionais</div></div>
+    <div class="kpi c1"><div class="kpi-lbl">Pacientes Hoje</div><div class="kpi-val" id="vgPac">--</div><div class="kpi-sub">total informado</div></div>
+    <div class="kpi c2"><div class="kpi-lbl">Motoristas</div><div class="kpi-val" id="vgMot">--</div><div class="kpi-sub">em atividade hoje</div></div>
+    <div class="kpi c3"><div class="kpi-lbl">Próximas Viagens</div><div class="kpi-val" id="vgFut">--</div><div class="kpi-sub">agendadas</div></div>
+    <div class="kpi c4"><div class="kpi-lbl">Viagens Históricas</div><div class="kpi-val" id="vgHist">--</div><div class="kpi-sub">base estatística</div></div>
+    <div class="kpi c5"><div class="kpi-lbl">Destinos</div><div class="kpi-val" id="vgDest">--</div><div class="kpi-sub">rotas registradas</div></div>
+  </div>
+  <div class="row2">
+    <div class="card"><div class="card-hd"><h3>🚐 VIAGENS DE HOJE</h3><span id="vgViagensSub">--</span></div><div class="table-scroll"><table class="vt"><thead><tr><th>Saída</th><th>Motorista</th><th>Veículo</th><th>Destino</th><th>Pacientes</th><th>Obs.</th></tr></thead><tbody id="vgTbody"></tbody></table></div></div>
+    <div class="card"><div class="card-hd"><h3>🟢 PLANTÃO</h3><span>escala vigente</span></div><div id="vgPlantao" class="mini-plantao"></div></div>
+  </div>
+  <div class="card"><div class="card-hd"><h3>📋 PRÓXIMAS VIAGENS</h3><span id="vgFutSub">--</span></div><div class="table-scroll"><table class="vt"><thead><tr><th>Data</th><th>Motorista</th><th>Veículo</th><th>Destino</th><th>Saída</th><th>Pacientes</th><th>Obs.</th></tr></thead><tbody id="vgFutTbody"></tbody></table></div></div>
+</section>
+
+<!-- PLANTÃO -->
+<section class="tab-panel" id="panelPlantao">
+  <div class="date-banner"><div><div class="date-hoje" id="dateHoje">--</div><div class="date-sub" id="dateSub">--</div></div><div class="regras-box"><div class="regra">🚫 Após 14h — viagens &gt;160 km não devem ser acionadas</div><div class="regra">🚫 Após 19h — nenhum acionamento de quem irá entrar no plantão</div><div id="regraHora" class="regra-hora"></div></div></div>
+  <div class="sec-title">🟢 Plantão de Hoje</div><div class="plantao-grid" id="plantaoGrid"></div>
+  <div class="card"><div class="card-hd"><h3>📅 PRÓXIMOS 7 DIAS</h3><span>escala vigente</span></div><div class="table-scroll"><table class="dt"><thead><tr><th>Data</th><th>Dia</th><th>P1</th><th>P2</th><th>P3</th><th>Indisponíveis</th></tr></thead><tbody id="proxTbody"></tbody></table></div></div>
+</section>
+
+<!-- VIAGENS -->
+<section class="tab-panel" id="panelViagens">
+  <div class="viagens-kpis">
+    <div class="kpi c0"><div class="kpi-lbl">Hoje</div><div class="kpi-val" id="vkHoje">--</div><div class="kpi-sub" id="vkHojeData">--</div></div>
+    <div class="kpi c1"><div class="kpi-lbl">Ontem</div><div class="kpi-val" id="vkOntem">--</div><div class="kpi-sub" id="vkOntemData">--</div></div>
+    <div class="kpi c2"><div class="kpi-lbl">Motoristas Hoje</div><div class="kpi-val" id="vkMots">--</div><div class="kpi-sub">em atividade</div></div>
+    <div class="kpi c3"><div class="kpi-lbl">Pacientes Hoje</div><div class="kpi-val" id="vkPac">--</div><div class="kpi-sub">informados na escala</div></div>
+    <div class="kpi c4"><div class="kpi-lbl">Próximas</div><div class="kpi-val" id="vkFuturas">--</div><div class="kpi-sub">agendadas</div></div>
+  </div>
+  <div class="card"><div class="card-hd"><h3>🚐 ONTEM E HOJE</h3><span id="vSubtitle">--</span></div><div class="log-toolbar"><input class="search" id="viagensSearch" placeholder="🔍 Buscar motorista, destino, veículo, placa..."></div><div class="table-scroll"><table class="vt"><thead><tr><th>Dia</th><th>Motorista</th><th>Veículo</th><th>Destino</th><th>Saída</th><th>Pacientes</th><th>Obs.</th></tr></thead><tbody id="viagensTbody"></tbody></table></div></div>
+  <div class="info-banner" id="avisoPostagem">📋 Registros publicados após 19h permanecem visíveis e entram automaticamente no dia correspondente.</div>
+  <div class="card" id="cardFuturas"><div class="card-hd"><h3>📋 PRÓXIMAS VIAGENS AGENDADAS</h3><span id="vFuturasSub">--</span></div><div class="table-scroll"><table class="vt"><thead><tr><th>Data</th><th>Motorista</th><th>Veículo</th><th>Destino</th><th>Saída</th><th>Pacientes</th><th>Obs.</th></tr></thead><tbody id="futurasTbody"></tbody></table></div></div>
+</section>
+
+<!-- ESCALA -->
+<section class="tab-panel" id="panelEscala"><div class="card-scroll"><div class="card-hd"><h3>📅 ESCALA COMPLETA DO CICLO</h3><span id="escalaSub">--</span></div><div class="esc-outer"><div class="esc-fixed"><div id="escalaNomes"></div></div><div class="esc-scroll"><div id="escalaDias"></div></div></div></div></section>
+
+<!-- ESTATÍSTICAS -->
+<section class="tab-panel" id="panelStats">
+  <div class="filters-wrap"><div class="filters-title">🔍 Filtros interativos <button class="btn btn-small" id="btnResetF">✕ Limpar</button></div><div class="fg"><div><label>Mês</label><div class="chips" id="fMes"></div></div><div><label>Semana</label><div class="chips" id="fSem"></div></div><div><label>Motorista</label><div class="chips" id="fMot"></div></div><div><label>Veículo</label><div class="chips" id="fVei"></div></div><div><label>Destino</label><div class="chips" id="fDest"></div></div><div><label>Resultado</label><div id="fResult" class="result-filter">--</div></div></div></div>
+  <div class="eq-banner"><div><h2>⚖️ ÍNDICE DE EQUIDADE</h2><p>Variação entre motoristas no período filtrado. Categorias operacionais especiais não entram neste cálculo.</p></div><div><div class="eq-score" id="eqScore">--</div><div class="eq-score-sub">/ 100</div></div></div>
+  <div class="kpis"><div class="kpi c0"><div class="kpi-lbl">Total de Viagens</div><div class="kpi-val" id="kT">--</div><div class="kpi-sub" id="kP">--</div></div><div class="kpi c1"><div class="kpi-lbl">Média / Motorista</div><div class="kpi-val" id="kA">--</div><div class="kpi-sub">viagens/pessoa</div></div><div class="kpi c2"><div class="kpi-lbl">Destinos</div><div class="kpi-val" id="kD">--</div><div class="kpi-sub">rotas diferentes</div></div><div class="kpi c3"><div class="kpi-lbl">Mais Viagens</div><div class="kpi-val" id="kTop">--</div><div class="kpi-sub" id="kTopN">--</div></div><div class="kpi c4"><div class="kpi-lbl">Variação Máxima</div><div class="kpi-val" id="kV">--</div><div class="kpi-sub">entre motoristas</div></div></div>
+  <div class="row2"><div class="card"><div class="card-hd"><h3>📋 RANKING POR MOTORISTA</h3><span id="tblSub">--</span></div><div class="table-scroll"><table class="dt"><thead><tr><th>#</th><th>Motorista</th><th>Viagens</th><th>Participação</th><th>Destino principal</th><th>Veículo principal</th><th>vs média</th></tr></thead><tbody id="drvTbody"></tbody></table></div></div><div class="card"><div class="card-hd"><h3>🥧 DISTRIBUIÇÃO</h3><span>% por motorista</span></div><div class="donut-wrap"><div class="donut-rel"><svg class="dn" width="140" height="140" viewBox="0 0 140 140" id="donutSvg"></svg><div class="dn-center"><div class="dn-num" id="donutN">--</div><div class="dn-lbl">viagens</div></div></div><div class="legend" id="donutLeg"></div></div></div></div>
+  <div class="eq-sec"><div class="eq-sec-hd"><h3>⚖️ EQUIDADE INDIVIDUAL</h3><span>🟢 acima · 🔴 abaixo · média = <span id="avgLbl">--</span></span></div><div class="eq-grid" id="eqGrid"></div></div>
+  <div class="row3"><div class="card"><div class="card-hd"><h3>🔥 MOTORISTA × DESTINO</h3><span>nº viagens</span></div><div class="heat-wrap" id="heatWrap"></div></div><div class="card"><div class="card-hd"><h3>📈 EVOLUÇÃO SEMANAL</h3><span>viagens/semana</span></div><div class="wchart-wrap"><div class="wchart-bars" id="wChart"></div><div class="wchart-legend" id="wLeg"></div></div></div></div>
+  <div class="row3"><div class="card"><div class="card-hd"><h3>📍 VIAGENS POR DESTINO</h3><span id="destSub">--</span></div><div class="table-scroll"><table class="dt"><thead><tr><th>Destino</th><th>Total</th><th>Distribuição</th><th>Motoristas</th></tr></thead><tbody id="destTbody"></tbody></table></div></div><div class="card"><div class="card-hd"><h3>🚗 VIAGENS POR VEÍCULO</h3><span id="veiSub">--</span></div><div class="table-scroll"><table class="dt"><thead><tr><th>Veículo</th><th>Total</th><th>Distribuição</th><th>Motoristas</th></tr></thead><tbody id="veiTbody"></tbody></table></div></div></div>
+  <div class="card"><div class="card-hd"><h3>📄 REGISTRO DE VIAGENS FILTRADAS</h3><span id="logSub">--</span></div><div class="log-toolbar"><input class="search" id="logSearch" placeholder="🔍 Buscar motorista, destino, veículo, placa..."><button class="btn btn-export" id="btnExportLog">📥 Exportar</button></div><div class="log-wrap"><table class="log"><thead><tr><th>Data</th><th>Motorista</th><th>Destino</th><th>Veículo</th><th>Saída/Hora</th><th>Pacientes</th><th>Origem</th><th>Obs.</th></tr></thead><tbody id="logTbody"></tbody></table></div></div>
+</section>
+
+<footer><p>🔒 Painel unificado · GMS · Prefeitura de Naviraí · Marcio Castro</p><p>UTI: <span id="footerUTI">--</span> · Transporte: <span id="footerFone">--</span> · <span id="tsLbl">--</span></p></footer>
+</div></div>
+<div id="tip"></div>
+<script src="./js/config.js"></script><script src="./js/app.js"></script>
+</body>
+</html>
